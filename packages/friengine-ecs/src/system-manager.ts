@@ -25,7 +25,7 @@ export class SystemManager {
         this.systems.forEach(system => callback(system));
     }
 
-    @bind public update(milliseconds: number): void {
+    @bind public tick(milliseconds: number): void {
         this.forEach(system => system.updateFromGameLoop(milliseconds));
     }
 }
