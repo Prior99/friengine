@@ -1,0 +1,36 @@
+{
+    "collectCoverage": true,
+    "moduleFileExtensions": [
+        "ts",
+        "js"
+    ],
+    "preset": "ts-jest",
+    "transform": {
+        "\\.ts$": "ts-jest"
+    },
+    "coverageReporters": [
+        "lcov",
+        "json",
+        "text"
+    ],
+    "testMatch": [
+        "<rootDir>/test/**/test-*.ts"
+    ],
+    "globals": {
+        "ts-jest": {
+            "ignoreCoverageForDecorators": true,
+            "ignoreCoverageForAllDecorators": true
+        }
+    },
+    "coveragePathIgnorePatterns": [
+        "/node_modules/",
+        "/test/"
+    ],
+    "collectCoverageFrom": [
+        "src/**/*.ts"
+    ],
+    "moduleNameMapper": {
+        "^friengine-(.*)$": "<rootDir>/../friengine-$1/src",
+        "friengine-common": "<rootDir>/../friengine-common/src"
+    }
+}

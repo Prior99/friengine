@@ -1,0 +1,18 @@
+{
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "private": true,
+  "jest": {
+    "projects": ["packages/*"],
+    "preset": "./jest-defaults.json"
+  },
+  "devDependencies": {
+    "jest": "^25.1.0",
+    "lerna": "^3.2.1"
+  }
+}
