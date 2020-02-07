@@ -1,11 +1,12 @@
 import { Constructable, DeepReadonly } from "friengine-core";
-import { Component } from "./component";
+import { Component, ComponentClass } from "./component";
 import { bind } from "bind-decorator";
 
+export type EntityClass = Constructable<Entity, [number, number]>;
 export class Entity {
     public markedForDeletion = false;
     public componentsChanged = false;
-    private components = new Map<Constructable<Component>, Component>();
+    private components = new Map<ComponentClass, Component>();
     private changedLocallySinceLastSerialization = false;
 
     constructor(public id: number, public originalCreator: number) {}
@@ -50,7 +51,7 @@ export class Entity {
         this.markedForDeletion = true;
     }
 
-    public get componentClasses(): Constructable<Component>[] {
+    public get componentClasses(): ComponentClass[] {
         return Array.from(this.components.keys());
     }
 
@@ -60,7 +61,7 @@ export class Entity {
         this.components.forEach((component, componentClass) => callback(componentClass, component));
     }
 
-    @bind public hasComponent(componentClass: Constructable<Component>): boolean {
+    @bind public hasComponent(componentClass: ComponentClass): boolean {
         return this.components.has(componentClass);
     }
 

@@ -11,7 +11,6 @@
         "test": "jest",
         "lint": "eslint --max-warnings 0 src/**/*.ts test/**/*.ts"
     },
-    "prettier": "../../prettier-defaults.json",
     "eslintConfig": {
         "extends": "../../eslint-defaults.json"
     },

@@ -1,6 +1,8 @@
+import { Constructable } from "friengine-core/src";
+
+export type ComponentClass = Constructable<Component, []>;
+
 export interface Component {
-    new(): unknown;
-    name: string;
     clone(): Component;
     equals(other: Component): boolean;
 }

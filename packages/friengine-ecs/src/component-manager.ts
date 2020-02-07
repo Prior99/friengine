@@ -1,18 +1,18 @@
 import { Constructable } from "friengine-core";
-import { Component } from "./component";
+import { Component, ComponentClass } from "./component";
 import { bind } from "bind-decorator";
 
 export class ComponentManager {
-    private components = new Map<string, Constructable<Component>>();
+    private components = new Map<string, ComponentClass>();
 
-    @bind public register(componentClass: Constructable<Component>): void {
+    @bind public add(componentClass: ComponentClass): void {
         if (this.components.has(componentClass.name)) {
             throw new Error("Can't register component twice.");
         }
         this.components.set(componentClass.name, componentClass);
     }
 
-    @bind public getComponentClass(name: string): Constructable<Component> | undefined {
+    @bind public byName(name: string): ComponentClass | undefined {
         return this.components.get(name);
     }
 }
