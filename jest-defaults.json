@@ -27,7 +27,7 @@
         "/test/"
     ],
     "collectCoverageFrom": [
-        "src/**/*.ts"
+        "<rootDir>/src/**/*.ts"
     ],
     "moduleNameMapper": {
         "^friengine-(.*)$": "<rootDir>/../friengine-$1/src",

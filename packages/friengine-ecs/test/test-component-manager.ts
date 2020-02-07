@@ -16,9 +16,15 @@ describe("ComponentManager", () => {
     });
 
     describe("after adding a component", () => {
-        beforeEach(() => ecs.componentManager.add(TestComponent))
+        beforeEach(() => ecs.componentManager.add(TestComponent));
 
         it("finds that component by name", () =>
             expect(ecs.componentManager.byName(TestComponent.name)).toBe(TestComponent));
+
+        it("throws when adding the same component again", () => {
+            expect(() => ecs.componentManager.add(TestComponent)).toThrowErrorMatchingInlineSnapshot(
+                `"Can't register component twice."`,
+            );
+        });
     });
 });
