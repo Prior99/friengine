@@ -1,5 +1,5 @@
 {
-    "name": "friengine-common",
+    "name": "friengine-core",
     "version": "0.0.0",
     "description": "Common utilities for friengine.",
     "main": "dist/index.js",
