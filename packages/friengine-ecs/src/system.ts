@@ -2,7 +2,7 @@ import { EntityManager } from "./entity-manager";
 import { Constructable } from "friengine-core";
 import { bind } from "bind-decorator";
 
-export type SystemClass<T extends System> = Constructable<T, [EntityManager]>;
+export type SystemClass<T extends System = System> = Constructable<T, [EntityManager]>;
 
 export abstract class System {
     protected milliseconds = 0;

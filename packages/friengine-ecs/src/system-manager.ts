@@ -8,7 +8,7 @@ export class SystemManager {
 
     private systems = new Map<SystemClass<System>, System>();
 
-    @bind public getSystem<T extends System>(systemClass: SystemClass<T>): T | undefined {
+    @bind public byClass<T extends System>(systemClass: SystemClass<T>): T | undefined {
         return this.systems.get(systemClass) as (T | undefined);
     }
 
