@@ -1,1 +1,1 @@
-export * from "./numerical-id-generator";
+export * from "./numerical-id";

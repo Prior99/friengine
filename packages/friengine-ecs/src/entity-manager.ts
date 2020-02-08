@@ -1,4 +1,4 @@
-import { Constructable, numericalIdGenerator } from "friengine-core";
+import { Constructable, numericalId } from "friengine-core";
 import { bind } from "bind-decorator";
 import { Entity } from "./entity";
 import { ComponentClass } from "./component";
@@ -11,19 +11,13 @@ export interface CreateEntityOptions {
 export class EntityManager {
     constructor(private componentManager: ComponentManager) { }
 
-    public serial: number = numericalIdGenerator().next().value;
-
-    private entityIdGenerator = numericalIdGenerator();
+    public serial: number = numericalId();
 
     private entities = new Map<number, Entity>();
     private indexComponents = new Map<ComponentClass, Set<number>>();
 
-    private get newEntityId(): number {
-        return this.entityIdGenerator.next().value;
-    }
-
     @bind public createEntity({ components: componentClasses }: CreateEntityOptions = {}): Entity {
-        const id = this.newEntityId;
+        const id = numericalId();
         const entity = new Entity(id, this.serial);
         if (componentClasses) {
             componentClasses.forEach(entity.addComponent);
@@ -34,7 +28,7 @@ export class EntityManager {
 
     public addEntity(entity: Entity): void {
         while (this.entities.has(entity.id)) {
-            entity.id = this.entityIdGenerator.next().value;
+            entity.id = numericalId();
         }
         this.entities.set(entity.id, entity);
         this.reindexEntity(entity);
