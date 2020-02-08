@@ -1,16 +1,20 @@
 import { Component } from "../../src";
 
-export function createComponent() {
-    return class SomeComponent implements Component {
-        constructor(private value = 0) {}
+export function createComponent(name = "TestComponent") {
+    const obj = {
+        [name]: class implements Component {
+            constructor(private value = 0) { }
 
-        clone(): Component {
-            return new SomeComponent(this.value);
+            clone(): Component {
+                return new obj[name](this.value);
 
-        }
+            }
 
-        equals(other: SomeComponent): boolean {
-            return this.value === other.value;
+            equals(other: any): boolean { // eslint-disable-line
+                return this.value === other.value;
+            }
         }
     };
+    Object.defineProperty(obj[name], "name", { value: name });
+    return obj[name];
 }
