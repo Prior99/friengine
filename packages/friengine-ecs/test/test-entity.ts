@@ -1,33 +1,149 @@
-import { Ecs, createEcs, ComponentClass, SystemClass, EntityManager, ComponentManager, SystemManager } from "../src";
+import {
+    Ecs,
+    createEcs,
+    ComponentClass,
+    SystemClass,
+    EntityManager,
+    ComponentManager,
+    SystemManager,
+    Entity,
+    Component,
+} from "../src";
 import { createComponent, createSystem } from "./factories";
 
-describe("SystemManager", () => {
+describe("Entity", () => {
     let ecs: Ecs;
-    let TestSystem: SystemClass;
-    let tickFn: jest.Mock;
+    let componentClass: ComponentClass;
+    let entity: Entity;
 
     beforeEach(() => {
-        tickFn = jest.fn();
-        TestSystem = createSystem(tickFn);
-        ecs = createEcs();
+        componentClass = createComponent();
+        ecs = createEcs({ components: [componentClass] });
+        entity = ecs.entityManager.createEntity();
     });
 
-    it("can be ticked without systems added", () => expect(() => ecs.systemManager.update(1000)).not.toThrowError());
+    it("has a numeric id", () => expect(typeof entity.id).toBe("number"));
 
-    describe("after adding a system", () => {
-        beforeEach(() => ecs.systemManager.add(TestSystem));
+    it("stores the serial of its manager", () => expect(entity.originalCreator).toBe(ecs.entityManager.serial));
 
-        it("knows the system", () => expect(ecs.systemManager.byClass(TestSystem)).toBeInstanceOf(TestSystem));
+    it("is the same entity as itself", () => expect(entity.isSame(entity)).toBe(true));
 
-        it("throws error when adding the same system again", () =>
-            expect(() => ecs.systemManager.add(TestSystem)).toThrowErrorMatchingInlineSnapshot(
-                `"Can't add system twice."`,
+    it("is equal to itself", () => expect(entity.equals(entity)).toBe(true));
+
+    describe("initially", () => {
+        it("is not dirty", () => expect(entity.dirty).toBe(false));
+
+        it("is not marked for deletion", () => expect(entity.markedForDeletion).toBe(false));
+
+        it("components didn't change", () => expect(entity.componentsChanged).toBe(false));
+
+        it("cannot find any component", () => expect(entity.component(componentClass)).toBeUndefined());
+
+        it("throws error when removing unknown component", () =>
+            expect(() => entity.removeComponent(componentClass)).toThrowErrorMatchingInlineSnapshot(
+                `"Can't remove component from entity that wasn't added."`,
             ));
 
-        describe("when ticked", () => {
-            beforeEach(() => ecs.systemManager.update(1000));
+        it("doesn't have any component", () => expect(entity.hasComponent(componentClass)).toBe(false));
 
-            it("ticks all systems", () => expect(tickFn).toHaveBeenCalledWith(1000));
+        describe("when iterating components", () => {
+            let callback: (componentClass: ComponentClass, component: Component) => void;
+
+            beforeEach(() => {
+                callback = jest.fn();
+                entity.forEach(callback);
+            });
+
+            it("doesn't call the callback", () => expect(callback).not.toHaveBeenCalled());
+        });
+
+        it("has no component classes", () => expect(entity.componentClasses).toEqual([]));
+    });
+
+    describe("after being deleted", () => {
+        beforeEach(() => entity.delete());
+
+        it("is marked for deletion", () => expect(entity.markedForDeletion).toBe(true));
+
+        it("is dirty", () => expect(entity.dirty).toBe(true));
+    });
+
+    describe("after adding a component", () => {
+        beforeEach(() => entity.addComponent(componentClass));
+
+        it("is dirty", () => expect(entity.dirty).toBe(true));
+
+        it("finds that component", () => expect(entity.component(componentClass)).toEqual(expect.any(componentClass)));
+
+        it("has that component", () => expect(entity.hasComponent(componentClass)).toBe(true));
+
+        it("has the component class", () => expect(entity.componentClasses).toEqual([componentClass]));
+
+        it("doesn't equal random other entity", () => expect(entity.equals(ecs.entityManager.createEntity())).toBe(false));
+
+        it("random other entity doesn't equal this", () => expect(ecs.entityManager.createEntity().equals(entity)).toBe(false));
+
+        describe("after being duplicated", () => {
+            let duplicate: Entity;
+            let spyEntityComponentEquals: jest.SpyInstance<boolean, [Component]>;
+            let spyEntityComponentClone: jest.SpyInstance<Component, []>;
+            let component: Component;
+
+            beforeEach(() => {
+                component = entity.component(componentClass)!;
+                spyEntityComponentClone = jest.spyOn(component, "clone");
+                spyEntityComponentEquals = jest.spyOn(component, "equals");
+                duplicate = ecs.entityManager.duplicate(entity.id);
+            });
+
+            it("called clone on its component", () => expect(spyEntityComponentClone).toHaveBeenCalled());
+
+            describe("when comparing for equality", () => {
+                let result: boolean;
+
+                beforeEach(() => (result = entity.equals(duplicate)));
+
+                it("called equals on its component", () =>
+                    expect(spyEntityComponentEquals).toHaveBeenCalledWith(duplicate.component(componentClass)));
+
+                it("is equal to its duplicate", () => expect(result).toBe(true));
+            });
+
+            it("is not the same as its duplicate", () => expect(entity.isSame(duplicate)).toBe(false));
+
+            describe("with the component reporting not to be equal", () => {
+                beforeEach(() => spyEntityComponentEquals.mockImplementation(() => false));
+
+                it("is not equal to its duplicate", () => expect(entity.equals(duplicate)).toBe(false));
+            });
+        });
+
+        describe("after resetting dirty state", () => {
+            beforeEach(() => entity.resetDirty());
+
+            it("is not dirty", () => expect(entity.dirty).toBe(false));
+        });
+
+        describe("when iterating components", () => {
+            let callback: (componentClass: ComponentClass, component: Component) => void;
+
+            beforeEach(() => {
+                callback = jest.fn();
+                entity.forEach(callback);
+            });
+
+            it("calls the callback with the component", () =>
+                expect(callback).toHaveBeenCalledWith(componentClass, expect.any(componentClass)));
+        });
+
+        describe("after removing the component", () => {
+            beforeEach(() => entity.removeComponent(componentClass));
+
+            it("cannot find that component", () => expect(entity.component(componentClass)).toBeUndefined());
+
+            it("doesn't have that component", () => expect(entity.hasComponent(componentClass)).toBe(false));
+
+            it("doesn't have the component class", () => expect(entity.componentClasses).toEqual([]));
         });
     });
 });

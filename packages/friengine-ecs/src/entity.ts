@@ -1,4 +1,4 @@
-import { Constructable, DeepReadonly } from "friengine-core";
+import { Constructable } from "friengine-core";
 import { Component, ComponentClass } from "./component";
 import { bind } from "bind-decorator";
 
@@ -27,22 +27,14 @@ export class Entity {
         this.componentsChanged = false;
     }
 
-    @bind public componentReadonly<T extends Component>(componentClass: Constructable<T>): DeepReadonly<T | undefined> {
-        if (!this.components.has(componentClass)) {
-            return;
-        }
-        return this.components.get(componentClass)! as DeepReadonly<T>;
-    }
-
-    @bind public componentReadWrite<T extends Component>(componentClass: Constructable<T>): T | undefined {
-        if (!this.components.has(componentClass)) {
-            return;
-        }
-        this.changedLocallySinceLastSerialization = true;
-        return this.components.get(componentClass)! as T;
+    @bind public component<T extends Component>(componentClass: Constructable<T>): T | undefined {
+        return this.components.get(componentClass) as T;
     }
 
     @bind public removeComponent<T extends Component>(componentClass: Constructable<T>): void {
+        if (!this.components.has(componentClass)) {
+            throw new Error("Can't remove component from entity that wasn't added.");
+        }
         this.changedLocallySinceLastSerialization = true;
         this.components.delete(componentClass);
     }
@@ -86,7 +78,7 @@ export class Entity {
             if (!entity.hasComponent(componentClass)) {
                 return false;
             }
-            if (!component.equals(entity.componentReadonly(componentClass)!)) {
+            if (!component.equals(entity.component(componentClass)!)) {
                 return false;
             }
         }

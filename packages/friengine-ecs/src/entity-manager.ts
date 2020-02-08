@@ -11,8 +11,9 @@ export interface CreateEntityOptions {
 export class EntityManager {
     constructor(private componentManager: ComponentManager) { }
 
+    public serial: number = numericalIdGenerator().next().value;
+
     private entityIdGenerator = numericalIdGenerator();
-    private serial: number = numericalIdGenerator().next().value;
 
     private entities = new Map<number, Entity>();
     private indexComponents = new Map<ComponentClass, Set<number>>();
