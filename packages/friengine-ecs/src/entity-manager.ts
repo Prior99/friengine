@@ -21,7 +21,7 @@ export class EntityManager {
         return this.entityIdGenerator.next().value;
     }
 
-    @bind public createEntity({ components: componentClasses }: CreateEntityOptions): Entity {
+    @bind public createEntity({ components: componentClasses }: CreateEntityOptions = {}): Entity {
         const id = this.newEntityId;
         const entity = new Entity(id, this.serial);
         if (componentClasses) {
