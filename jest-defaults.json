@@ -32,7 +32,6 @@
         "<rootDir>/src/**/*.ts"
     ],
     "moduleNameMapper": {
-        "^friengine-(.*)$": "<rootDir>/../friengine-$1/src",
-        "friengine-common": "<rootDir>/../friengine-common/src"
+        "^friengine-(.*)$": "<rootDir>/../friengine-$1/src"
     }
 }

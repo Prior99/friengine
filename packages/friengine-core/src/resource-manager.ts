@@ -50,7 +50,7 @@ export class ResourceManager {
     private resources = new Map<number, Resource<unknown>>();
     private listeners = new Map<number, ResourceListener<unknown>[]>();
 
-    constructor(private parallel = 4) { }
+    constructor(private parallel = 4) {}
 
     public add<T>(type: Symbol, loader: ResourceLoader<T>): Resource<T> {
         const id = numericalId();
@@ -67,8 +67,17 @@ export class ResourceManager {
 
     public waitFor<T>(id: number): Promise<DoneResource<T>> {
         return new Promise((resolve, reject) => {
-            if (!this.resources.has(id)) {
+            const resource = this.resources.get(id);
+            if (!resource) {
                 reject(new Error("Can't wait for unknown resource"));
+                return;
+            }
+            if (resource.status === LoadStatus.DONE) {
+                resolve(resource as DoneResource<T>);
+                return;
+            }
+            if (resource.status === LoadStatus.ERROR) {
+                reject(resource.error);
                 return;
             }
             const listener = { resolve, reject } as ResourceListener<unknown>;

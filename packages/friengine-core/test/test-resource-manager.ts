@@ -109,6 +109,9 @@ describe("ResourceManager", () => {
 
             it("promise waiting for resource 2 didn't reject", () => expect(waitForResource2Rejected).toBe(false));
 
+            it("waiting for resource 1 immediately resolved", () =>
+                expect(resourceManager.waitFor(resource1.id)).resolves.toEqual(resource1));
+
             describe("after resource 2 finished loading", () => {
                 beforeEach(() => loader2.finish());
 
@@ -134,6 +137,9 @@ describe("ResourceManager", () => {
                     expect(waitForResource3Resolved2).toBe(false));
 
                 it("promise waiting for resource 2 rejected", () => expect(waitForResource2Rejected).toBe(true));
+
+                it("waiting for resource 2 immediately rejects", () =>
+                    expect(resourceManager.waitFor(resource2.id)).rejects.toEqual((resource2 as any).error));
 
                 describe("after resource 3 finished loading", () => {
                     beforeEach(() => loader3.finish());
