@@ -15,10 +15,7 @@
         "extends": "../../eslint-defaults.json"
     },
     "jest": {
-        "preset": "../../jest-defaults.json",
-        "moduleNameMapper": {
-            "friengine-common": "<rootDir>/../friengine-common/src"
-        }
+        "preset": "../../jest-defaults.json"
     },
     "devDependencies": {
         "@types/jest": "^25.1.2",

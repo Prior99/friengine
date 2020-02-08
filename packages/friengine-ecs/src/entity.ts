@@ -7,7 +7,6 @@ export class Entity {
     public markedForDeletion = false;
     public componentsChanged = false;
     private components = new Map<ComponentClass, Component>();
-    private changedLocallySinceLastSerialization = false;
 
     constructor(public id: number, public originalCreator: number) {}
 
@@ -15,7 +14,7 @@ export class Entity {
         this.componentsChanged = true;
         const component = new componentClass();
         this.components.set(componentClass, component);
-        this.changedLocallySinceLastSerialization = true; return component;
+        return component;
     }
 
     public get dirty(): boolean {
@@ -35,7 +34,6 @@ export class Entity {
         if (!this.components.has(componentClass)) {
             throw new Error("Can't remove component from entity that wasn't added.");
         }
-        this.changedLocallySinceLastSerialization = true;
         this.components.delete(componentClass);
     }
 

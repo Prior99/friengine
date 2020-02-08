@@ -107,8 +107,7 @@ export class EntityManager {
             }
             if (entity.markedForDeletion) {
                 entitiesToDelete.push(entity);
-            }
-            if (entity.componentsChanged) {
+            } else { // if (entity.componentsChanged)
                 this.reindexEntity(entity);
             }
         });

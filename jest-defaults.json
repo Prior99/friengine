@@ -1,5 +1,13 @@
 {
     "collectCoverage": true,
+    "coverageThreshold": {
+      "global": {
+        "statements": 100,
+        "lines": 100,
+        "functions": 100
+      }
+    },
+
     "moduleFileExtensions": [
         "ts",
         "js"
@@ -16,12 +24,6 @@
     "testMatch": [
         "<rootDir>/test/**/test-*.ts"
     ],
-    "globals": {
-        "ts-jest": {
-            "ignoreCoverageForDecorators": true,
-            "ignoreCoverageForAllDecorators": true
-        }
-    },
     "coveragePathIgnorePatterns": [
         "/node_modules/",
         "/test/"
