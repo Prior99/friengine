@@ -1,39 +1,38 @@
-import { ResourceManager, Resource, DoneResource, ResourceHandle } from "friengine-core";
+import { ResourceManager, Resource, DoneResource, ResourceHandle, createSpecificResourceManager } from "friengine-core";
 import { LoadImage, loadImage as defaultLoadImage } from "./utils";
 
 export interface ImageManagerOptions {
     loadImage?: LoadImage;
 }
 
-export class ImageManager {
-    static RESOURCE_TYPE = Symbol("ResourceTypeImage");
+export interface ImageLoadOptions {
+    url: string;
+}
 
-    public static add(url: string, loadImage: LoadImage = defaultLoadImage): ResourceHandle<HTMLImageElement> {
-        return ResourceManager.add({
-            type: this.RESOURCE_TYPE,
-            load: () => loadImage(url),
-        });
+export const imageManagerConfig = createSpecificResourceManager<HTMLImageElement, ImageLoadOptions>(Symbol("ResourceTypeImage"));
+
+export class ImageManager extends imageManagerConfig.superClass {
+    static add(url: string): ResourceHandle<HTMLImageElement> {
+        return imageManagerConfig.add({ url });
     }
 
-    constructor(private resourceManager: ResourceManager, private options: ImageManagerOptions = {}) {}
-
-    public async waitUntilFinished(): Promise<DoneResource<HTMLImageElement>[]> {
-        return await Promise.all(
-            this.resourceManager
-                .search({ type: ImageManager.RESOURCE_TYPE })
-                .map(resource => this.resourceManager.waitFor<HTMLImageElement>(resource)),
-        );
+    static get allHandles(): ResourceHandle<HTMLImageElement>[] {
+        return imageManagerConfig.allHandles();
     }
 
-    public get<HTMLImageElement>(resourceHandle: ResourceHandle<HTMLImageElement>): HTMLImageElement {
-        return this.resourceManager.get(resourceHandle);
+    constructor(resourceManager: ResourceManager, private options: ImageManagerOptions = {}) {
+        super(resourceManager);
     }
 
-    public getResource<HTMLImageElement>(resourceHandle: ResourceHandle<HTMLImageElement>): Resource<HTMLImageElement> {
-        return this.resourceManager.getResource(resourceHandle);
+    private get loadImage(): LoadImage {
+        return this.options.loadImage ?? defaultLoadImage;
     }
 
-    public load<HTMLImageElement>(handle: ResourceHandle<HTMLImageElement>): Resource<HTMLImageElement> {
-        return this.resourceManager.load(handle);
+    public load(handle: ResourceHandle<HTMLImageElement>): Resource<HTMLImageElement> {
+        return super.load(handle, ({ url }: ImageLoadOptions) => this.loadImage(url));
+    }
+
+    public async loadAll(): Promise<DoneResource<HTMLImageElement>[]> {
+        return super.loadAll(({ url }: ImageLoadOptions) => this.loadImage(url));
     }
 }

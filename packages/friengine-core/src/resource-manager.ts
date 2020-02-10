@@ -1,6 +1,3 @@
-import { Constructable } from "./types";
-import { numericalId } from "./utils";
-
 export enum LoadStatus {
     PENDING = "pending",
     IN_PROGRESS = "in progress",
@@ -33,8 +30,10 @@ export type Resource<T> = DoneResource<T> | ErrorResource<T> | UnfinishedResourc
 
 export interface ResourceLoader<T> {
     type: symbol;
-    load: () => Promise<T>;
+    options: T;
 }
+
+export type LoaderFunction<TOptions, TResource> = (options: TOptions) => Promise<TResource>;
 
 export interface ResourceListener<T> {
     resolve: (resource: DoneResource<T>) => void;
@@ -60,6 +59,12 @@ export class ResourceManager {
         return handle;
     }
 
+    public static getHandlesForType<T>(type: symbol): ResourceHandle<T>[] {
+        return Array.from(ResourceManager.registry.entries())
+            .filter(([_symbol, value]) => value.type === type)
+            .map(([symbol]) => ({ symbol }));
+    }
+
     public static reset(): void {
         ResourceManager.registry = new Map();
     }
@@ -70,11 +75,6 @@ export class ResourceManager {
     private listeners = new Map<symbol, ResourceListener<unknown>[]>();
 
     constructor(private parallel = 4) {}
-
-    public async loadAll(): Promise<void> {
-        const resources = Array.from(ResourceManager.registry.keys()).map(symbol => this.load({ symbol }));
-        await Promise.all(resources.map(resource => this.waitFor(resource)));
-    }
 
     public get<T>(resourceHandle: ResourceHandle<T>): T {
         const resource = this.getResource(resourceHandle);
@@ -95,15 +95,15 @@ export class ResourceManager {
         return result as Resource<T>;
     }
 
-    public load<T>(handle: ResourceHandle<T>): Resource<T> {
+    public load<T, U>(handle: ResourceHandle<T>, load: LoaderFunction<U, T>): Resource<T> {
         const { symbol } = handle;
         const resourceLoader = ResourceManager.registry.get(symbol);
         if (!resourceLoader) {
             throw new Error("Not a resource handle.");
         }
-        const { load, type } = resourceLoader as ResourceLoader<T>;
+        const { options, type } = resourceLoader as ResourceLoader<U>;
         const resource: Resource<T> = {
-            load,
+            load: () => load(options),
             type,
             status: LoadStatus.PENDING,
             symbol,
@@ -113,7 +113,7 @@ export class ResourceManager {
         return resource;
     }
 
-    public waitFor<T>(resource: Resource<unknown>): Promise<DoneResource<T>> {
+    public waitFor<T>(resource: Resource<T>): Promise<DoneResource<T>> {
         return new Promise((resolve, reject) => {
             const { symbol } = resource;
             if (!this.resources.has(resource.symbol)) {

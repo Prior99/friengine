@@ -28,6 +28,7 @@
         "eslint-plugin-jest": "^23.6.0",
         "eslint-plugin-prettier": "^3.1.2",
         "jest": "^25.1.0",
+        "node-canvas-webgl": "^0.2.6",
         "prettier": "^1.19.1",
         "ts-jest": "^25.2.0"
     }

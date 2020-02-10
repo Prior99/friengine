@@ -2,14 +2,10 @@ import {
     Ecs,
     createEcs,
     ComponentClass,
-    SystemClass,
-    EntityManager,
-    ComponentManager,
-    SystemManager,
     Entity,
     Component,
 } from "../src";
-import { createComponent, createSystem } from "./factories";
+import { createComponent } from "./factories";
 
 describe("Entity", () => {
     let ecs: Ecs;

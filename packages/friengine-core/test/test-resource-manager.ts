@@ -21,7 +21,7 @@ describe("ResourceManager", () => {
         });
         return {
             loader: {
-                load: (): Promise<string> => promise,
+                options: { load: (): Promise<string> => promise },
                 type,
             },
             finish,
@@ -52,9 +52,9 @@ describe("ResourceManager", () => {
             ));
 
         it("loading a resource that hasn't been registered", () =>
-            expect(() => resourceManager.load({ symbol: Symbol() })).toThrowErrorMatchingInlineSnapshot(
-                `"Not a resource handle."`,
-            ));
+            expect(() =>
+                resourceManager.load({ symbol: Symbol() }, async () => undefined),
+            ).toThrowErrorMatchingInlineSnapshot(`"Not a resource handle."`));
     });
 
     describe("after adding 3 resources", () => {
@@ -79,6 +79,9 @@ describe("ResourceManager", () => {
             handle3 = ResourceManager.add(loader3.loader);
         });
 
+        it("can get all resource handles for a type", () =>
+            expect(ResourceManager.getHandlesForType(type1)).toEqual([handle1]));
+
         it("getResource throws with a resource that is not loaded", () =>
             expect(() => resourceManager.getResource(handle2)).toThrowErrorMatchingInlineSnapshot(
                 `"Cannot read property 'symbol' of undefined"`,
@@ -89,29 +92,14 @@ describe("ResourceManager", () => {
                 `"Resource handle not loaded in this instance."`,
             ));
 
-        describe("when loading all resources at the same time", () => {
-            beforeEach(() => {
-                const promise = resourceManager.loadAll();
-                loader1.finish();
-                loader3.finish();
-                return promise;
-            });
-
-            it("is done", () => expect(resourceManager.done).toBe(true));
-
-            it("loaded data for resource 1", () => expect(resourceManager.get(handle1)).toBe("value 1"));
-
-            it("loaded data for resource 3", () => expect(resourceManager.get(handle3)).toBe("value 3"));
-        });
-
         describe("when loading all resources individually", () => {
             beforeEach(() => {
                 loader2 = createLoader("value 2", type1, true);
                 handle2 = ResourceManager.add(loader2.loader);
 
-                resource1 = resourceManager.load(handle1);
-                resource2 = resourceManager.load(handle2);
-                resource3 = resourceManager.load(handle3);
+                resource1 = resourceManager.load(handle1, (options: any) => options.load());
+                resource2 = resourceManager.load(handle2, (options: any) => options.load());
+                resource3 = resourceManager.load(handle3, (options: any) => options.load());
                 resourceManager.waitFor(resource2).catch(() => (waitForResource2Rejected = true));
                 resourceManager.waitFor(resource3).then(() => (waitForResource3Resolved1 = true));
                 resourceManager.waitFor(resource3).then(() => (waitForResource3Resolved2 = true));
@@ -168,6 +156,8 @@ describe("ResourceManager", () => {
 
                 it("waiting for resource 1 immediately resolved", () =>
                     expect(resourceManager.waitFor(resource1)).resolves.toEqual(resource1));
+
+                it("can get the data", () => expect(resourceManager.get(handle1)).toBe("value 1"));
 
                 describe("after resource 2 finished loading", () => {
                     beforeEach(() => loader2.finish());
