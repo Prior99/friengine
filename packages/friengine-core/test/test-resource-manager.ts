@@ -215,4 +215,59 @@ describe("ResourceManager", () => {
             });
         });
     });
+
+    describe("dependencies", () => {
+        let loaders: ReturnType<typeof createLoader>[];
+        let handle1: ResourceHandle<string>;
+        let handle2: ResourceHandle<string>;
+        let handle3: ResourceHandle<string>;
+        let handle4: ResourceHandle<string>;
+        let resources: Resource<string>[];
+
+        beforeEach(() => {
+            loaders = [
+                createLoader("value 1", type1),
+                createLoader("value 2", type1),
+                createLoader("value 3", type2),
+                createLoader("value 4", type2),
+            ];
+            ResourceManager.reset();
+            handle1 = ResourceManager.add(loaders[0].loader);
+            handle2 = ResourceManager.add(loaders[1].loader);
+            handle3 = ResourceManager.add({
+                ...loaders[2].loader,
+                dependencies: [handle1, handle2],
+            });
+            handle4 = ResourceManager.add({
+                ...loaders[3].loader,
+                dependencies: [handle3],
+            });
+        });
+
+        describe("when loading all resources at once", () => {
+            beforeEach(() => {
+                resources = [
+                    resourceManager.load(handle1, (options: any) => options.load()),
+                    resourceManager.load(handle2, (options: any) => options.load()),
+                    resourceManager.load(handle3, (options: any) => options.load()),
+                    resourceManager.load(handle4, (options: any) => options.load()),
+                ];
+            });
+
+            describe("after waiting for all resources to have loaded", () => {
+                beforeEach(async () => {
+                    loaders.forEach(loader => loader.finish());
+                    await Promise.all(resources.map(resource => resourceManager.waitFor(resource)));
+                });
+
+                it("has loaded resource 1", () => expect(resourceManager.get(handle1)).toBe("value 1"));
+
+                it("has loaded resource 2", () => expect(resourceManager.get(handle2)).toBe("value 2"));
+
+                it("has loaded resource 3", () => expect(resourceManager.get(handle3)).toBe("value 3"));
+
+                it("has loaded resource 4", () => expect(resourceManager.get(handle4)).toBe("value 4"));
+            });
+        });
+    });
 });

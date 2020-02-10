@@ -1,4 +1,4 @@
-import { ResourceManager, DoneResource, ResourceHandle, LoaderFunction, Resource } from "./resource-manager";
+import { ResourceManager, DoneResource, ResourceHandle, LoaderFunction, Resource, ResourceLoader } from "./resource-manager";
 import { Constructable } from "./types";
 
 export interface SpecificResourceManager<TData, TOptions> {
@@ -12,7 +12,7 @@ export interface SpecificResourceManager<TData, TOptions> {
 
 export interface SpecificResourceManagerConfig<TData, TOptions> {
     superClass: Constructable<SpecificResourceManager<TData, TOptions>, [ResourceManager]>;
-    add: (options: TOptions) => ResourceHandle<TData>;
+    add: (args: Omit<ResourceLoader<TOptions>, "type">) => ResourceHandle<TData>;
     allHandles: () => ResourceHandle<TData>[];
 }
 
@@ -20,11 +20,8 @@ export interface SpecificResourceManagerConfig<TData, TOptions> {
 export function createSpecificResourceManager<TData, TOptions>(
     resourceType: symbol,
 ): SpecificResourceManagerConfig<TData, TOptions> {
-    function add(options: TOptions): ResourceHandle<TData> {
-        return ResourceManager.add({
-            type: resourceType,
-            options,
-        });
+    function add(args: Omit<ResourceLoader<TOptions>, "type">): ResourceHandle<TData> {
+        return ResourceManager.add({ ...args, type: resourceType });
     }
 
     function allHandles(): ResourceHandle<TData>[] {

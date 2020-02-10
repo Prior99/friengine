@@ -9,11 +9,13 @@ export interface ImageLoadOptions {
     url: string;
 }
 
-export const imageManagerConfig = createSpecificResourceManager<HTMLImageElement, ImageLoadOptions>(Symbol("ResourceTypeImage"));
+export const RESOURCE_TYPE_IMAGE = Symbol("ResourceTypeImage");
+
+export const imageManagerConfig = createSpecificResourceManager<HTMLImageElement, ImageLoadOptions>(RESOURCE_TYPE_IMAGE);
 
 export class ImageManager extends imageManagerConfig.superClass {
     static add(url: string): ResourceHandle<HTMLImageElement> {
-        return imageManagerConfig.add({ url });
+        return imageManagerConfig.add({ options: { url } });
     }
 
     static get allHandles(): ResourceHandle<HTMLImageElement>[] {

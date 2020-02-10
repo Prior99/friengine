@@ -1,3 +1,5 @@
+import { Z_FILTERED } from "zlib";
+
 export enum LoadStatus {
     PENDING = "pending",
     IN_PROGRESS = "in progress",
@@ -10,6 +12,7 @@ export interface BaseResource<T> {
     status: LoadStatus;
     type: symbol;
     symbol: symbol;
+    dependencies: ResourceHandle<unknown>[];
 }
 
 export interface DoneResource<T> extends BaseResource<T> {
@@ -31,6 +34,7 @@ export type Resource<T> = DoneResource<T> | ErrorResource<T> | UnfinishedResourc
 export interface ResourceLoader<T> {
     type: symbol;
     options: T;
+    dependencies?: ResourceHandle<unknown>[];
 }
 
 export type LoaderFunction<TOptions, TResource> = (options: TOptions) => Promise<TResource>;
@@ -44,6 +48,7 @@ export interface ResourceSearchOptions {
     status?: LoadStatus;
     anyStatus?: LoadStatus[];
     type?: symbol;
+    filter?: (resource: Resource<unknown>, index: number) => boolean;
 }
 
 export interface ResourceHandle<T> {
@@ -101,12 +106,13 @@ export class ResourceManager {
         if (!resourceLoader) {
             throw new Error("Not a resource handle.");
         }
-        const { options, type } = resourceLoader as ResourceLoader<U>;
+        const { options, type, dependencies = [] } = resourceLoader as ResourceLoader<U>;
         const resource: Resource<T> = {
             load: () => load(options),
             type,
             status: LoadStatus.PENDING,
             symbol,
+            dependencies,
         };
         this.resources.set(symbol, resource);
         this.fillQueue();
@@ -156,24 +162,39 @@ export class ResourceManager {
         return Array.from(this.resources.values());
     }
 
-    public search({ status, anyStatus, type }: ResourceSearchOptions = {}): Resource<unknown>[] {
+    public search({ status, anyStatus, type, filter }: ResourceSearchOptions = {}): Resource<unknown>[] {
         return this.all
             .filter(resource => !status || resource.status === status)
             .filter(resource => !anyStatus || anyStatus.includes(resource.status))
-            .filter(resource => !type || resource.type === type);
+            .filter(resource => !type || resource.type === type)
+            .filter((resource, index) => !filter || filter(resource, index));
+    }
+
+    private get processableResources(): UnfinishedResource<unknown>[] {
+        return this.search({ filter: resource => this.isResourceLoadable(resource) }) as UnfinishedResource<unknown>[];
+    }
+
+    private isResourceLoadable(resource: Resource<unknown>): boolean {
+        if (resource.status !== LoadStatus.PENDING) {
+            return false;
+        }
+        return (
+            resource.dependencies.length === 0 ||
+            resource.dependencies.every(handle => this.getResource(handle).status === LoadStatus.DONE)
+        );
     }
 
     private fillQueue(): void {
         while (
             this.search({ status: LoadStatus.IN_PROGRESS }).length < this.parallel &&
-            this.search({ status: LoadStatus.PENDING }).length !== 0
+            this.processableResources.length > 0
         ) {
             this.processNext();
         }
     }
 
     private processNext(): void {
-        const resource = this.all.find(resource => resource.status === LoadStatus.PENDING);
+        const resource = this.all.find(resource => this.isResourceLoadable(resource));
         /* istanbul ignore if */
         if (!resource) {
             return;

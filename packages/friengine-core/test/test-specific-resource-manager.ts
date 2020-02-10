@@ -70,8 +70,8 @@ describe("SpecificResourceManager", () => {
         let handle2: ResourceHandle<string>;
 
         beforeEach(() => {
-            handle1 = testManager1Config.add({ value: "value 1" });
-            handle2 = testManager2Config.add({ value: "value 2" });
+            handle1 = testManager1Config.add({ options: { value: "value 1" } });
+            handle2 = testManager2Config.add({ options: { value: "value 2" } });
         });
 
         it("called add on ResourceManager", () => expect(spyAdd).toHaveBeenCalledTimes(2));
