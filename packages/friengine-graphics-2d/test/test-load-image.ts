@@ -7,7 +7,6 @@ describe("loadImage", () => {
         let error: Error | undefined = undefined;
         beforeEach(() => {
             jest.spyOn(Image.prototype, "addEventListener").mockImplementation((name: any, callback: any) => {
-                // eslint-disable-line
                 if (name === "error") {
                     callback(new Error("Oops!"));
                 }
@@ -22,7 +21,6 @@ describe("loadImage", () => {
         let image: HTMLImageElement | undefined = undefined;
         beforeEach(() => {
             jest.spyOn(Image.prototype, "addEventListener").mockImplementation((name: any, callback: any) => {
-                // eslint-disable-line
                 if (name === "load") {
                     callback();
                 }

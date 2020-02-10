@@ -67,12 +67,12 @@ export class Entity {
      }
 
     @bind public equals(entity: Entity): boolean {
-        for (let [componentClass] of entity.components.entries()) {
+        for (const [componentClass] of entity.components.entries()) {
             if (!this.hasComponent(componentClass)) {
                 return false;
             }
         }
-        for (let [componentClass, component] of this.components.entries()) {
+        for (const [componentClass, component] of this.components.entries()) {
             if (!entity.hasComponent(componentClass)) {
                 return false;
             }

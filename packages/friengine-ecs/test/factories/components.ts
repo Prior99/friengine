@@ -1,6 +1,6 @@
 import { Component } from "../../src";
 
-export function createComponent(name = "TestComponent") {
+export function createComponent(name = "TestComponent"): Component {
     const obj = {
         [name]: class implements Component {
             constructor(private value = 0) { }

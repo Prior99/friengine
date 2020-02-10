@@ -1,5 +1,4 @@
-import { Constructable } from "friengine-core";
-import { Component, ComponentClass } from "./component";
+import { ComponentClass } from "./component";
 import { bind } from "bind-decorator";
 
 export class ComponentManager {

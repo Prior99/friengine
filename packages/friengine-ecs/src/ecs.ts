@@ -1,7 +1,6 @@
-import { Constructable } from "friengine-core/src";
 import { EntityManager } from "./entity-manager";
 import { ComponentManager } from "./component-manager";
-import { Component, ComponentClass } from "./component";
+import { ComponentClass } from "./component";
 import { SystemManager } from "./system-manager";
 import { SystemClass, System } from "./system";
 

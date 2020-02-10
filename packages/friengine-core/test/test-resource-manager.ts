@@ -2,13 +2,13 @@ import { ResourceManager, Resource, LoadStatus, DoneResource, ErrorResource } fr
 
 describe("ResourceManager", () => {
     let resourceManager: ResourceManager;
-    let type1: Symbol;
-    let type2: Symbol;
+    let type1: symbol;
+    let type2: symbol;
 
-    const createLoader = (value: string, error = false) => {
+    const createLoader = (value: string, error = false): any  => {
         let resolve: (value: string) => void;
         let reject: (err: Error) => void;
-        let finish = () => {
+        const finish = (): any => {
             if (error) {
                 reject(new Error("Something went wrong"));
             } else {

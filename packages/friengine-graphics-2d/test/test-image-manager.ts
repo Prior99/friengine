@@ -6,7 +6,6 @@ describe("ImageManager", () => {
     let resourceManager: ResourceManager;
     let loadImage: jest.MockedFunction<LoadImage>;
     let spyResourceManagerAdd: jest.SpyInstance<any>;
-    let spyResourceManagerWaitFor: jest.SpyInstance<any>;
 
     beforeEach(() => {
         loadImage = jest.fn(async (url: string) => {
@@ -19,7 +18,7 @@ describe("ImageManager", () => {
         });
         resourceManager = new ResourceManager();
         spyResourceManagerAdd = jest.spyOn(resourceManager, "add");
-        spyResourceManagerWaitFor = jest.spyOn(resourceManager, "waitFor");
+        jest.spyOn(resourceManager, "waitFor");
         imageManager = new ImageManager(resourceManager, { loadImage });
     });
 

@@ -1,4 +1,4 @@
-import { Constructable, numericalId } from "friengine-core";
+import { numericalId } from "friengine-core";
 import { bind } from "bind-decorator";
 import { Entity } from "./entity";
 import { ComponentClass } from "./component";

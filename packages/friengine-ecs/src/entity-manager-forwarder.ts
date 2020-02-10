@@ -2,15 +2,18 @@ import { bind } from "bind-decorator";
 import { EntityManager } from "./entity-manager";
 import { Entity } from "./entity";
 
-type Params<T extends keyof EntityManager> = Parameters<EntityManager[T]>;
-type RetVal<T extends keyof EntityManager> = ReturnType<EntityManager[T]>;
+type Params<T extends keyof EntityManager> = EntityManager[T] extends (...args: any) => any // eslint-disable-line
+    ? Parameters<EntityManager[T]>
+    : never;
+type RetVal<T extends keyof EntityManager> = EntityManager[T] extends (...args: any) => any // eslint-disable-line
+    ? ReturnType<EntityManager[T]>
+    : never;
 type Public<T> = {
     [K in keyof T]: T[K];
-}
+};
 
-export class EntityManagerForwarder implements Omit<Public<EntityManager>, "update"> {
-    constructor(protected entityManager: EntityManager) {
-    }
+export class EntityManagerForwarder implements Omit<Omit<Public<EntityManager>, "update">, "serial"> {
+    constructor(protected entityManager: EntityManager) {}
 
     @bind public addEntity(...args: Params<"addEntity">): RetVal<"addEntity"> {
         return this.entityManager.addEntity(...args);
@@ -44,4 +47,3 @@ export class EntityManagerForwarder implements Omit<Public<EntityManager>, "upda
         return this.entityManager.findOne(...args);
     }
 }
-

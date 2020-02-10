@@ -1,4 +1,3 @@
-import { Constructable } from "friengine-core";
 import { System, SystemClass } from "./system";
 import { bind } from "bind-decorator";
 import { EntityManager } from "./entity-manager";
