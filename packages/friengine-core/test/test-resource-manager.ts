@@ -5,7 +5,7 @@ describe("ResourceManager", () => {
     let type1: symbol;
     let type2: symbol;
 
-    const createLoader = (value: string, type: symbol, error = false) => {
+    const createLoader = (value: string, type: symbol, error = false) => { // eslint-disable-line
         let resolve: (value: string) => void;
         let reject: (err: Error) => void;
         const finish = (): any => {
@@ -222,7 +222,6 @@ describe("ResourceManager", () => {
         let handle2: ResourceHandle<string>;
         let handle3: ResourceHandle<string>;
         let handle4: ResourceHandle<string>;
-        let resources: Resource<string>[];
 
         beforeEach(() => {
             loaders = [
@@ -244,9 +243,20 @@ describe("ResourceManager", () => {
             });
         });
 
+        describe("with a second resource manager", () => {
+            let resource: Resource<string>;
+
+            beforeEach(() => {
+                const other = new ResourceManager();
+                resource = other.load(handle3, (options: any) => options.load());
+            });
+
+            it("can't load foreign resource", () => expect(resourceManager.isResourceLoadable(resource)).toBe(false));
+        });
+
         describe("when loading all resources at once", () => {
             beforeEach(() => {
-                resources = [
+                [
                     resourceManager.load(handle1, (options: any) => options.load()),
                     resourceManager.load(handle2, (options: any) => options.load()),
                     resourceManager.load(handle3, (options: any) => options.load()),
@@ -257,7 +267,7 @@ describe("ResourceManager", () => {
             describe("after waiting for all resources to have loaded", () => {
                 beforeEach(async () => {
                     loaders.forEach(loader => loader.finish());
-                    await Promise.all(resources.map(resource => resourceManager.waitFor(resource)));
+                    await resourceManager.waitUntilFinished();
                 });
 
                 it("has loaded resource 1", () => expect(resourceManager.get(handle1)).toBe("value 1"));

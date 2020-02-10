@@ -1,4 +1,4 @@
-import { ResourceManager, Resource, DoneResource, ResourceHandle, createSpecificResourceManager } from "friengine-core";
+import { ResourceManager, ResourceHandle, SpecificResourceManager } from "friengine-core";
 import { LoadImage, loadImage as defaultLoadImage } from "./utils";
 
 export interface ImageManagerOptions {
@@ -11,16 +11,19 @@ export interface ImageLoadOptions {
 
 export const RESOURCE_TYPE_IMAGE = Symbol("ResourceTypeImage");
 
-export const imageManagerConfig = createSpecificResourceManager<HTMLImageElement, ImageLoadOptions>(RESOURCE_TYPE_IMAGE);
-
-export class ImageManager extends imageManagerConfig.superClass {
+export class ImageManager extends SpecificResourceManager<ImageLoadOptions, HTMLImageElement> {
     static add(url: string): ResourceHandle<HTMLImageElement> {
-        return imageManagerConfig.add({ options: { url } });
+        return ResourceManager.add({
+            type: RESOURCE_TYPE_IMAGE,
+            options: { url },
+        });
     }
 
     static get allHandles(): ResourceHandle<HTMLImageElement>[] {
-        return imageManagerConfig.allHandles();
+        return ResourceManager.getHandlesForType(RESOURCE_TYPE_IMAGE);
     }
+
+    protected readonly resourceType = RESOURCE_TYPE_IMAGE;
 
     constructor(resourceManager: ResourceManager, private options: ImageManagerOptions = {}) {
         super(resourceManager);
@@ -30,11 +33,7 @@ export class ImageManager extends imageManagerConfig.superClass {
         return this.options.loadImage ?? defaultLoadImage;
     }
 
-    public load(handle: ResourceHandle<HTMLImageElement>): Resource<HTMLImageElement> {
-        return super.load(handle, ({ url }: ImageLoadOptions) => this.loadImage(url));
-    }
-
-    public async loadAll(): Promise<DoneResource<HTMLImageElement>[]> {
-        return super.loadAll(({ url }: ImageLoadOptions) => this.loadImage(url));
+    protected loader({ url }: ImageLoadOptions): Promise<HTMLImageElement> {
+        return this.loadImage(url);
     }
 }

@@ -45,43 +45,53 @@ describe("TextureManager", () => {
 
         it("knows the handle", () => expect(TextureManager.allHandles).toHaveLength(1));
 
+        describe("with the webgl context working", () => {
+            const texture = {};
+
+            beforeEach(() => {
+                (mockGl.createTexture as any).mockImplementation(() => texture);
+            });
+
+            describe("after loading the textures all at once", () => {
+                let spyLoadImage: jest.SpyInstance<any>;
+                beforeEach(async () => {
+                    spyLoadImage = jest.spyOn(imageManager, "load");
+                    textureManager.loadAll();
+                });
+
+                it("called load with the dependency on the image manager", () =>
+                    expect(spyLoadImage).toHaveBeenCalledTimes(1));
+
+                describe("after the loading has finished", () => {
+                    beforeEach(async () => {
+                        await resourceManager.waitUntilFinished();
+                    });
+
+                    it("calls createTexture", () => expect(mockGl.createTexture).toHaveBeenCalled());
+
+                    it("calls bindTexture", () => expect(mockGl.bindTexture).toHaveBeenCalled());
+
+                    it("calls texImage2D", () => expect(mockGl.texImage2D).toHaveBeenCalled());
+
+                    it("calls texParameteri", () => expect(mockGl.texParameteri).toHaveBeenCalled());
+
+                    it("calls generateMipmap", () => expect(mockGl.generateMipmap).toHaveBeenCalled());
+
+                    it("can get the texture", () => expect(textureManager.get(handle)).toBe(texture));
+                });
+            });
+        });
+
         describe("with the webgl context not working", () => {
             beforeEach(() => (mockGl.createTexture as any).mockImplementation(() => null));
 
             describe("after loading the textures all at once", () => {
-                beforeEach(async () => {
-                    await imageManager.loadAll();
-                });
+                beforeEach(() => textureManager.loadAll());
 
                 it("fails to load", () =>
-                    expect(textureManager.loadAll()).rejects.toMatchInlineSnapshot(
+                    expect(resourceManager.waitUntilFinished()).rejects.toMatchInlineSnapshot(
                         `[Error: Failed to create new texture.]`,
                     ));
-            });
-        });
-
-        describe("with the webgl context working", () => {
-            const texture = {};
-
-            beforeEach(() => (mockGl.createTexture as any).mockImplementation(() => texture));
-
-            describe("after loading the textures all at once", () => {
-                beforeEach(async () => {
-                    await imageManager.loadAll();
-                    await textureManager.loadAll();
-                });
-
-                it("calls createTexture", () => expect(mockGl.createTexture).toHaveBeenCalled());
-
-                it("calls bindTexture", () => expect(mockGl.bindTexture).toHaveBeenCalled());
-
-                it("calls texImage2D", () => expect(mockGl.texImage2D).toHaveBeenCalled());
-
-                it("calls texParameteri", () => expect(mockGl.texParameteri).toHaveBeenCalled());
-
-                it("calls generateMipmap", () => expect(mockGl.generateMipmap).toHaveBeenCalled());
-
-                it("can get the texture", () => expect(textureManager.get(handle)).toBe(texture));
             });
         });
     });

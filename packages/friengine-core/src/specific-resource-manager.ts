@@ -1,14 +1,11 @@
-import { ResourceManager, DoneResource, ResourceHandle, LoaderFunction, Resource, ResourceLoader } from "./resource-manager";
+import {
+    ResourceManager,
+    DoneResource,
+    ResourceHandle,
+    Resource,
+    ResourceLoader,
+} from "./resource-manager";
 import { Constructable } from "./types";
-
-export interface SpecificResourceManager<TData, TOptions> {
-    resourceManager: ResourceManager;
-    waitUntilFinished(): Promise<DoneResource<TData>[]>;
-    get(resourceHandle: ResourceHandle<TData>): TData;
-    getResource(resourceHandle: ResourceHandle<TData>): Resource<TData>;
-    load(handle: ResourceHandle<TData>, load: LoaderFunction<TOptions, TData>): Resource<TData>;
-    loadAll(load: LoaderFunction<TOptions, TData>): Promise<DoneResource<TData>[]>;
-}
 
 export interface SpecificResourceManagerConfig<TData, TOptions> {
     superClass: Constructable<SpecificResourceManager<TData, TOptions>, [ResourceManager]>;
@@ -16,50 +13,44 @@ export interface SpecificResourceManagerConfig<TData, TOptions> {
     allHandles: () => ResourceHandle<TData>[];
 }
 
-// eslint-disable-next-line
-export function createSpecificResourceManager<TData, TOptions>(
-    resourceType: symbol,
-): SpecificResourceManagerConfig<TData, TOptions> {
-    function add(args: Omit<ResourceLoader<TOptions>, "type">): ResourceHandle<TData> {
-        return ResourceManager.add({ ...args, type: resourceType });
+export abstract class SpecificResourceManager<TOptions, TData> {
+    constructor(public resourceManager: ResourceManager) {}
+
+    public async waitUntilFinished(): Promise<DoneResource<TData>[]> {
+        return await Promise.all(
+            this.resourceManager
+                .search({ type: this.resourceType })
+                .map(resource => this.resourceManager.waitFor(resource as Resource<TData>)),
+        );
     }
 
-    function allHandles(): ResourceHandle<TData>[] {
-        return ResourceManager.getHandlesForType(resourceType);
+    protected abstract loader(options: TOptions): Promise<TData>;
+    protected readonly abstract resourceType: symbol;
+
+    public get(resourceHandle: ResourceHandle<TData>): TData {
+        return this.resourceManager.get(resourceHandle);
     }
 
-    class InternalSpecificResourceManager implements SpecificResourceManager<TData, TOptions> {
-        constructor(public resourceManager: ResourceManager) {}
-
-        public async waitUntilFinished(): Promise<DoneResource<TData>[]> {
-            return await Promise.all(
-                this.resourceManager
-                    .search({ type: resourceType })
-                    .map(resource => this.resourceManager.waitFor(resource as Resource<TData>)),
-            );
-        }
-
-        public get(resourceHandle: ResourceHandle<TData>): TData {
-            return this.resourceManager.get(resourceHandle);
-        }
-
-        public getResource(resourceHandle: ResourceHandle<TData>): Resource<TData> {
-            return this.resourceManager.getResource(resourceHandle);
-        }
-
-        public load(handle: ResourceHandle<TData>, load: LoaderFunction<TOptions, TData>): Resource<TData> {
-            return this.resourceManager.load(handle, load);
-        }
-
-        public async loadAll(load: LoaderFunction<TOptions, TData>): Promise<DoneResource<TData>[]> {
-            const resources = allHandles().map(handle => this.load(handle, load)) as Resource<TData>[];
-            return await Promise.all(resources.map(resource => this.resourceManager.waitFor(resource)));
-        }
+    public getResource(resourceHandle: ResourceHandle<TData>): Resource<TData> {
+        return this.resourceManager.getResource(resourceHandle);
     }
 
-    return {
-        add,
-        allHandles,
-        superClass: InternalSpecificResourceManager,
-    };
+    public load(handle: ResourceHandle<TData>): Resource<TData> {
+        return this.resourceManager.load(handle, (options: TOptions) => this.loader(options));
+    }
+
+    public loadAll(): Resource<TData>[] {
+        return ResourceManager.getHandlesForType(this.resourceType).map(handle => this.load(handle)) as Resource<TData>[];
+    }
+
+    public isKnownHandle(handle: ResourceHandle<unknown>): handle is ResourceHandle<TData> {
+        return ResourceManager.getHandlesForType(this.resourceType)
+            .map(({ symbol }) => symbol)
+            .includes(handle.symbol);
+    }
+
+    public loadAllKnownHandles(handles: ResourceHandle<unknown>[]): Resource<TData>[] {
+        const knownHandles: ResourceHandle<TData>[] = handles.filter(handle => this.isKnownHandle(handle));
+        return knownHandles.map(handle => this.load(handle));
+    }
 }

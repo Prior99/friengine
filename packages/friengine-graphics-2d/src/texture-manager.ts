@@ -1,5 +1,6 @@
-import { ResourceManager, Resource, DoneResource, ResourceHandle, createSpecificResourceManager } from "friengine-core";
+import { ResourceManager, ResourceHandle, SpecificResourceManager, Resource } from "friengine-core";
 import { ImageManager } from "./image-manager";
+
 export interface TextureManagerOptions {
     gl: WebGL2RenderingContext;
 }
@@ -10,22 +11,21 @@ export interface TextureLoadOptions {
 
 export const RESOURCE_TYPE_TEXTURE = Symbol("ResourceTypeTexture");
 
-export const textureManagerConfig = createSpecificResourceManager<WebGLTexture, TextureLoadOptions>(
-    RESOURCE_TYPE_TEXTURE,
-);
-
-export class TextureManager extends textureManagerConfig.superClass {
+export class TextureManager extends SpecificResourceManager<TextureLoadOptions, WebGLTexture> {
     static add(url: string): ResourceHandle<HTMLImageElement> {
         const imageHandle = ImageManager.add(url);
-        return textureManagerConfig.add({
+        return ResourceManager.add({
+            type: RESOURCE_TYPE_TEXTURE,
             options: { imageHandle },
             dependencies: [imageHandle],
         });
     }
 
     static get allHandles(): ResourceHandle<HTMLImageElement>[] {
-        return textureManagerConfig.allHandles();
+        return ResourceManager.getHandlesForType(RESOURCE_TYPE_TEXTURE);
     }
+
+    protected readonly resourceType = RESOURCE_TYPE_TEXTURE;
 
     constructor(
         resourceManager: ResourceManager,
@@ -35,7 +35,7 @@ export class TextureManager extends textureManagerConfig.superClass {
         super(resourceManager);
     }
 
-    private async loadTexture({ imageHandle }: TextureLoadOptions): Promise<WebGLTexture> {
+    protected async loader({ imageHandle }: TextureLoadOptions): Promise<WebGLTexture> {
         const image = this.imageManager.get(imageHandle);
         const { gl } = this.options;
         const texture = gl.createTexture();
@@ -52,10 +52,8 @@ export class TextureManager extends textureManagerConfig.superClass {
     }
 
     public load(handle: ResourceHandle<WebGLTexture>): Resource<WebGLTexture> {
-        return super.load(handle, options => this.loadTexture(options));
-    }
-
-    public async loadAll(): Promise<DoneResource<WebGLTexture>[]> {
-        return super.loadAll(options => this.loadTexture(options));
+        const resource = super.load(handle);
+        this.imageManager.loadAllKnownHandles(resource.dependencies);
+        return resource;
     }
 }

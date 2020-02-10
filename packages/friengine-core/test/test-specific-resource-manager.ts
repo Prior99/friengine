@@ -1,11 +1,7 @@
 import {
     ResourceHandle,
-    DoneResource,
-    createSpecificResourceManager,
-    Resource,
     ResourceManager,
     SpecificResourceManager,
-    SpecificResourceManagerConfig,
     Constructable,
     LoadStatus,
 } from "../src";
@@ -15,15 +11,10 @@ describe("SpecificResourceManager", () => {
         value: string;
     }
 
-    interface TestManager extends SpecificResourceManager<string, TestOptions> {
-        load(handle: ResourceHandle<string>): Resource<string>;
-        loadAll(): Promise<DoneResource<string>[]>;
-    }
+    type TestManager = SpecificResourceManager<string, TestOptions>;
 
     let resourceType1: symbol;
     let resourceType2: symbol;
-    let testManager1Config: SpecificResourceManagerConfig<string, TestOptions>;
-    let testManager2Config: SpecificResourceManagerConfig<string, TestOptions>;
     let loadFn1: jest.Mock<any>;
     let loadFn2: jest.Mock<any>;
     let TestManager1: Constructable<TestManager, [ResourceManager]>;
@@ -31,35 +22,23 @@ describe("SpecificResourceManager", () => {
     let resourceManager: ResourceManager;
     let testManager1: TestManager;
     let testManager2: TestManager;
-    let spyAdd: jest.SpyInstance<any>;
 
     beforeEach(() => {
-        spyAdd = jest.spyOn(ResourceManager, "add");
         resourceType1 = Symbol("ResourceTypeTest1");
         resourceType2 = Symbol("ResourceTypeTest2");
-        testManager1Config = createSpecificResourceManager<string, TestOptions>(resourceType1);
-        testManager2Config = createSpecificResourceManager<string, TestOptions>(resourceType2);
         loadFn1 = jest.fn(({ value }) => new Promise(resolve => setTimeout(() => resolve(value))));
         loadFn2 = jest.fn(({ value }) => new Promise(resolve => setTimeout(() => resolve(value))));
-        TestManager1 = class extends testManager1Config.superClass implements TestManager {
-            public load(handle: ResourceHandle<string>): Resource<string> {
-                return super.load(handle, loadFn1);
-            }
 
-            public async loadAll(): Promise<DoneResource<string>[]> {
-                return super.loadAll(loadFn1);
-            }
+        TestManager1 = class extends SpecificResourceManager<string, TestOptions> {
+            protected readonly resourceType = resourceType1;
+            protected loader = loadFn1;
         };
 
-        TestManager2 = class extends testManager2Config.superClass implements TestManager {
-            public load(handle: ResourceHandle<string>): Resource<string> {
-                return super.load(handle, loadFn2);
-            }
-
-            public async loadAll(): Promise<DoneResource<string>[]> {
-                return super.loadAll(loadFn2);
-            }
+        TestManager2 = class extends SpecificResourceManager<string, TestOptions> {
+            protected readonly resourceType = resourceType2;
+            protected loader = loadFn2;
         };
+
         resourceManager = new ResourceManager();
         testManager1 = new TestManager1(resourceManager);
         testManager2 = new TestManager2(resourceManager);
@@ -70,15 +49,17 @@ describe("SpecificResourceManager", () => {
         let handle2: ResourceHandle<string>;
 
         beforeEach(() => {
-            handle1 = testManager1Config.add({ options: { value: "value 1" } });
-            handle2 = testManager2Config.add({ options: { value: "value 2" } });
+            handle1 = ResourceManager.add({ type: resourceType1, options: { value: "value 1" } });
+            handle2 = ResourceManager.add({ type: resourceType2, options: { value: "value 2" } });
         });
 
-        it("called add on ResourceManager", () => expect(spyAdd).toHaveBeenCalledTimes(2));
+        describe("loading a mixture of known and foreign resource handles", () => {
+            beforeEach(() => testManager1.loadAllKnownHandles([ handle1, handle2 ]));
 
-        it("finds all resource handles for manager 1", () => expect(testManager1Config.allHandles()).toHaveLength(1));
+            it("called the loader only once", () => expect(loadFn1).toHaveBeenCalledTimes(1));
 
-        it("finds all resource handles for manager 2", () => expect(testManager2Config.allHandles()).toHaveLength(1));
+            it("called the loader for the correct handle", () => expect(loadFn1).toHaveBeenCalledWith({ value: "value 1"}));
+        });
 
         describe("when loading resources individually", () => {
             beforeEach(() => testManager1.load(handle1));
@@ -95,14 +76,20 @@ describe("SpecificResourceManager", () => {
         });
 
         describe("after loading all resources for manager 1", () => {
-            beforeEach(() => testManager1.loadAll());
+            beforeEach(async () => {
+                testManager1.loadAll();
+                await testManager1.waitUntilFinished();
+            });
 
             it("can get data for resource", () => expect(testManager1.get(handle1)).toBe("value 1"));
 
             it("can get resource", () => expect(testManager1.getResource(handle1).status).toBe(LoadStatus.DONE));
 
             describe("after loading all resources for manager 2", () => {
-                beforeEach(() => testManager2.loadAll());
+                beforeEach(async () => {
+                    testManager2.loadAll();
+                    await resourceManager.waitUntilFinished();
+                });
 
                 it("can get data for resource", () => expect(testManager2.get(handle2)).toBe("value 2"));
 

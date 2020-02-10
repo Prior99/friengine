@@ -21,6 +21,7 @@
         "@types/jest": "^25.1.2",
         "@types/node": "^13.7.0",
         "@types/typescript": "^2.0.0",
+        "@types/winston": "^2.4.4",
         "@typescript-eslint/eslint-plugin": "^2.19.0",
         "@typescript-eslint/parser": "^2.19.0",
         "eslint": "^6.8.0",
@@ -30,5 +31,8 @@
         "jest": "^25.1.0",
         "prettier": "^1.19.1",
         "ts-jest": "^25.2.0"
+    },
+    "dependencies": {
+        "winston": "^3.2.1"
     }
 }

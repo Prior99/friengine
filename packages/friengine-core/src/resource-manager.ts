@@ -1,4 +1,4 @@
-import { Z_FILTERED } from "zlib";
+import { logger } from "./utils";
 
 export enum LoadStatus {
     PENDING = "pending",
@@ -57,6 +57,7 @@ export interface ResourceHandle<T> {
 
 export class ResourceManager {
     public static add<T>(loader: ResourceLoader<T>): ResourceHandle<T> {
+        logger.debug("Added new resource handle.");
         const handle = {
             symbol: Symbol(),
         };
@@ -158,6 +159,10 @@ export class ResourceManager {
         return this.search({ type, anyStatus: [LoadStatus.IN_PROGRESS, LoadStatus.PENDING] }).length === 0;
     }
 
+    public async waitUntilFinished(): Promise<DoneResource<unknown>[]> {
+        return await Promise.all(this.all.map(resource => this.waitFor(resource as Resource<unknown>)));
+    }
+
     private get all(): Resource<unknown>[] {
         return Array.from(this.resources.values());
     }
@@ -170,26 +175,39 @@ export class ResourceManager {
             .filter((resource, index) => !filter || filter(resource, index));
     }
 
+    public knowsHandle(handle: ResourceHandle<unknown>): boolean {
+        return this.resources.has(handle.symbol);
+    }
+
     private get processableResources(): UnfinishedResource<unknown>[] {
         return this.search({ filter: resource => this.isResourceLoadable(resource) }) as UnfinishedResource<unknown>[];
     }
 
-    private isResourceLoadable(resource: Resource<unknown>): boolean {
+    public isResourceLoadable(resource: Resource<unknown>): boolean {
         if (resource.status !== LoadStatus.PENDING) {
             return false;
         }
         return (
             resource.dependencies.length === 0 ||
-            resource.dependencies.every(handle => this.getResource(handle).status === LoadStatus.DONE)
+            resource.dependencies.every(handle => {
+                if (!this.knowsHandle(handle)) {
+                    return false;
+                }
+                return this.getResource(handle).status === LoadStatus.DONE;
+            })
         );
     }
 
+    private get isBusy(): boolean {
+        return this.search({ status: LoadStatus.IN_PROGRESS }).length < this.parallel;
+    }
+
     private fillQueue(): void {
-        while (
-            this.search({ status: LoadStatus.IN_PROGRESS }).length < this.parallel &&
-            this.processableResources.length > 0
-        ) {
+        while (this.isBusy && this.processableResources.length > 0) {
             this.processNext();
+        }
+        if (this.processableResources.length > 0 && !this.isBusy) {
+            logger.debug("Out of processable resources, but not all resources have been loaded.");
         }
     }
 
