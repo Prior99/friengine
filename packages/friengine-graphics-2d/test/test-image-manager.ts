@@ -1,5 +1,5 @@
 import { ImageManager, LoadImage } from "../src";
-import { ResourceManager } from "friengine-core";
+import { ResourceManager, ResourceHandle } from "friengine-core";
 
 describe("ImageManager", () => {
     let imageManager: ImageManager;
@@ -17,9 +17,9 @@ describe("ImageManager", () => {
             return img;
         });
         resourceManager = new ResourceManager();
-        spyResourceManagerAdd = jest.spyOn(resourceManager, "add");
+        spyResourceManagerAdd = jest.spyOn(ResourceManager, "add");
         jest.spyOn(resourceManager, "waitFor");
-        imageManager = new ImageManager(resourceManager, { loadImage });
+        imageManager = new ImageManager(resourceManager);
     });
 
     describe("after adding 3 working images", () => {
@@ -28,19 +28,39 @@ describe("ImageManager", () => {
             "http://example.com/image2.jpg",
             "http://example.com/image3.jpg",
         ];
-        beforeEach(() => urls.forEach(url => imageManager.add(url)));
+
+        let handles: ResourceHandle<HTMLImageElement>[];
+
+        beforeEach(() => {
+            ResourceManager.reset();
+            handles = urls.map(url => ImageManager.add(url, loadImage));
+        });
 
         it("called add on the ResourceManager 3 times", () => expect(spyResourceManagerAdd).toHaveBeenCalledTimes(3));
 
-        it("calls loadImage with each url", () => expect(loadImage.mock.calls).toEqual([...urls.map(url => [url])]));
+        describe("after loading the images", () => {
+            beforeEach(async () => await resourceManager.loadAll());
 
-        it("can wait for the images to load", async () =>
-            expect((await imageManager.waitUntilFinished()).map(resource => resource.data.src)).toEqual(urls));
+            it("calls loadImage with each url", () =>
+                expect(loadImage.mock.calls).toEqual([...urls.map(url => [url])]));
+
+            it("can wait for the images to load", async () =>
+                expect((await imageManager.waitUntilFinished()).map(resource => resource.data.src)).toEqual(urls));
+
+            it("can get an image", async () =>
+                expect((await imageManager.get(handles[0]).src)).toBe(urls[0]));
+
+            it("can get an image resource", async () =>
+                expect((await imageManager.getResource(handles[0]).symbol)).toBe(handles[0].symbol));
+        });
     });
 
     describe("after adding images with erroneous urls", () => {
         const urls = ["http://example.com/image.jpg", "http://example.com/error.jpg"];
-        beforeEach(() => urls.forEach(url => imageManager.add(url)));
+        beforeEach(() => {
+            ResourceManager.reset();
+            urls.forEach(url => imageManager.load(ImageManager.add(url, loadImage)));
+        });
 
         it("waiting for the images to load rejects", () =>
             expect(imageManager.waitUntilFinished()).rejects.toMatchInlineSnapshot(`[Error: Failed to load image.]`));

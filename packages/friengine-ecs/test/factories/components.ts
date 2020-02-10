@@ -1,6 +1,6 @@
-import { Component } from "../../src";
+import { Component, ComponentClass } from "../../src";
 
-export function createComponent(name = "TestComponent"): Component {
+export function createComponent(name = "TestComponent"): ComponentClass {
     const obj = {
         [name]: class implements Component {
             constructor(private value = 0) { }
