@@ -1,14 +1,14 @@
-import { System, Ecs, createEcs } from "../src";
+import { System, EcsParts, createEcs } from "../src";
 
 describe("System", () => {
     class TestSystem extends System {
-        public time: number = 0;
+        public time = 0;
 
         public tick = jest.fn();
-    };
+    }
 
     let system: TestSystem;
-    let ecs: Ecs;
+    let ecs: EcsParts;
 
     beforeEach(() => {
         ecs = createEcs({

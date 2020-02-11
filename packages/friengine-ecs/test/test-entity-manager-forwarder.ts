@@ -1,10 +1,10 @@
-import { System, SystemClass, Ecs, createEcs, EntityManager, Entity, CreateEntityOptions, ComponentClass } from "../src";
+import { EcsParts, createEcs, Entity, CreateEntityOptions, ComponentClass } from "../src";
 import { createComponent } from "./factories";
 import { EntityManagerForwarder } from "../src/entity-manager-forwarder";
 
 describe("EntityManagerForwarder", () => {
     let forwarder: EntityManagerForwarder;
-    let ecs: Ecs;
+    let ecs: EcsParts;
 
     beforeEach(() => {
         ecs = createEcs({

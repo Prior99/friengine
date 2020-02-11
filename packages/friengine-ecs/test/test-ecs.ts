@@ -1,8 +1,8 @@
-import { Ecs, createEcs, ComponentClass, SystemClass, EntityManager, ComponentManager, SystemManager } from "../src";
+import { EcsParts, createEcs, ComponentClass, SystemClass, EntityManager, ComponentManager, SystemManager } from "../src";
 import { createComponent, createSystem } from "./factories";
 
 describe("createEcs", () => {
-    let ecs: Ecs;
+    let ecs: EcsParts;
     let TestComponent: ComponentClass;
     let TestSystem: SystemClass;
 

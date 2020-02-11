@@ -1,8 +1,8 @@
-import { ComponentManager, ComponentClass, Ecs, createEcs } from "../src";
+import { ComponentClass, EcsParts, createEcs } from "../src";
 import { createComponent } from "./factories";
 
 describe("ComponentManager", () => {
-    let ecs: Ecs;
+    let ecs: EcsParts;
     let TestComponent: ComponentClass;
 
     beforeEach(() => {

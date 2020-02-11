@@ -1,8 +1,8 @@
-import { Ecs, createEcs, ComponentClass, SystemClass, EntityManager, ComponentManager, SystemManager } from "../src";
-import { createComponent, createSystem } from "./factories";
+import { EcsParts, createEcs, SystemClass } from "../src";
+import { createSystem } from "./factories";
 
 describe("SystemManager", () => {
-    let ecs: Ecs;
+    let ecs: EcsParts;
     let TestSystem: SystemClass;
     let tickFn: jest.Mock;
 

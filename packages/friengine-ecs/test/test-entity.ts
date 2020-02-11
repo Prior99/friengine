@@ -1,5 +1,5 @@
 import {
-    Ecs,
+    EcsParts,
     createEcs,
     ComponentClass,
     Entity,
@@ -8,7 +8,7 @@ import {
 import { createComponent } from "./factories";
 
 describe("Entity", () => {
-    let ecs: Ecs;
+    let ecs: EcsParts;
     let componentClass: ComponentClass;
     let entity: Entity;
 
