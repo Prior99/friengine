@@ -3,6 +3,9 @@ import { Graphics2dParts, createGraphics2d, ImageManager, TextureManager, create
 
 jest.mock("../src/image-manager");
 jest.mock("../src/utils/create-canvas");
+jest.mock("../src/graphics-2d", () => ({
+    Graphics2d: class {},
+}));
 
 describe("createGraphics2d", () => {
     describe("with a functioning canvas", () => {

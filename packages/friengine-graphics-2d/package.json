@@ -15,9 +15,17 @@
         "extends": "../../eslint-defaults.json"
     },
     "jest": {
-        "preset": "../../jest-defaults.json"
+        "preset": "../../jest-defaults.json",
+        "setupFilesAfterEnv": [
+            "<rootDir>/test/setup.ts"
+        ],
+        "reporters": [
+            "default",
+            "jest-screenshot/reporter"
+        ]
     },
     "devDependencies": {
+        "@types/gl": "^4.1.0",
         "@types/jest": "^25.1.2",
         "@types/node": "^13.7.0",
         "@types/typescript": "^2.0.0",
@@ -27,8 +35,11 @@
         "eslint-config-prettier": "^6.10.0",
         "eslint-plugin-jest": "^23.6.0",
         "eslint-plugin-prettier": "^3.1.2",
+        "gl": "^4.4.1",
         "jest": "^25.1.0",
-        "node-canvas-webgl": "^0.2.6",
+        "jest-screenshot": "^0.3.0",
+        "node-gles": "^0.0.16",
+        "node-libpng": "^0.2.13",
         "prettier": "^1.19.1",
         "ts-jest": "^25.2.0"
     }

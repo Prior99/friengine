@@ -10,12 +10,12 @@ export interface EcsParts {
     systemManager: SystemManager;
 }
 
-export interface EcsOptions {
+export interface CreateEcsOptions {
     systems?: SystemClass<System>[]; 
     components?: ComponentClass[];
 }
 
-export function createEcs({ systems, components }: EcsOptions = {}): EcsParts {
+export function createEcs({ systems, components }: CreateEcsOptions = {}): EcsParts {
     const componentManager = new ComponentManager();
     const entityManager = new EntityManager(componentManager);
     const systemManager = new SystemManager(entityManager);

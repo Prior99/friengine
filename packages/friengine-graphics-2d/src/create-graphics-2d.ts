@@ -2,12 +2,14 @@ import { ResourceManager } from "friengine-core";
 import { ImageManager, ImageManagerOptions } from "./image-manager";
 import { TextureManager } from "./texture-manager";
 import { createCanvas } from "./utils";
+import { Graphics2d, Graphics2dOptions } from "./graphics-2d";
 
 export interface Graphics2dParts {
     resourceManager: ResourceManager,
     imageManager: ImageManager;
     textureManager: TextureManager;
     canvas: HTMLCanvasElement;
+    graphics2d: Graphics2d;
 }
 
 export interface CanvasOptions {
@@ -15,11 +17,12 @@ export interface CanvasOptions {
     height: number;
 }
 
-export interface Graphics2dOptions {
+export interface CreateGraphics2dOptions {
     resourceManager?: ResourceManager;
     canvas?: HTMLCanvasElement;
     imageManagerOptions?: ImageManagerOptions;
     canvasOptions?: CanvasOptions;
+    graphics2dOptions?: Graphics2dOptions;
 }
 
 export function createGraphics2d({
@@ -27,7 +30,8 @@ export function createGraphics2d({
     canvas = createCanvas(0, 0),
     imageManagerOptions,
     canvasOptions,
-}: Graphics2dOptions = {}): Graphics2dParts {
+    graphics2dOptions,
+}: CreateGraphics2dOptions = {}): Graphics2dParts {
     if (canvasOptions) {
         canvas.width = canvasOptions.width;
         canvas.height = canvasOptions.height;
@@ -38,5 +42,6 @@ export function createGraphics2d({
     }
     const imageManager = new ImageManager(resourceManager, imageManagerOptions);
     const textureManager = new TextureManager(resourceManager, imageManager, gl);
-    return { resourceManager, imageManager, textureManager, canvas };
+    const graphics2d = new Graphics2d(gl, graphics2dOptions);
+    return { resourceManager, imageManager, textureManager, canvas, graphics2d };
 }
