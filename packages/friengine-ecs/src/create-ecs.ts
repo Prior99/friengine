@@ -4,7 +4,7 @@ import { ComponentClass } from "./component";
 import { SystemManager } from "./system-manager";
 import { SystemClass, System } from "./system";
 
-export interface Ecs {
+export interface EcsParts {
     entityManager: EntityManager;
     componentManager: ComponentManager;
     systemManager: SystemManager;
@@ -15,7 +15,7 @@ export interface EcsOptions {
     components?: ComponentClass[];
 }
 
-export function createEcs({ systems, components }: EcsOptions = {}): Ecs {
+export function createEcs({ systems, components }: EcsOptions = {}): EcsParts {
     const componentManager = new ComponentManager();
     const entityManager = new EntityManager(componentManager);
     const systemManager = new SystemManager(entityManager);

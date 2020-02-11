@@ -19,7 +19,7 @@ describe("TextureManager", () => {
         } as any;
         resourceManager = new ResourceManager();
         imageManager = new ImageManager(resourceManager, { loadImage: async () => new Image() });
-        textureManager = new TextureManager(resourceManager, imageManager, { gl: mockGl });
+        textureManager = new TextureManager(resourceManager, imageManager, mockGl);
         spyAddImage = jest.spyOn(ImageManager, "add");
         spyAdd = jest.spyOn(ResourceManager, "add");
     });

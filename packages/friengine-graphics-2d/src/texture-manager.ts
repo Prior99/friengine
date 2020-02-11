@@ -1,10 +1,6 @@
 import { ResourceManager, ResourceHandle, SpecificResourceManager, Resource } from "friengine-core";
 import { ImageManager } from "./image-manager";
 
-export interface TextureManagerOptions {
-    gl: WebGL2RenderingContext;
-}
-
 export interface TextureLoadOptions {
     imageHandle: ResourceHandle<HTMLImageElement>;
 }
@@ -30,14 +26,14 @@ export class TextureManager extends SpecificResourceManager<TextureLoadOptions, 
     constructor(
         resourceManager: ResourceManager,
         private imageManager: ImageManager,
-        private options: TextureManagerOptions,
+        private gl: WebGL2RenderingContext,
     ) {
         super(resourceManager);
     }
 
     protected async loader({ imageHandle }: TextureLoadOptions): Promise<WebGLTexture> {
         const image = this.imageManager.get(imageHandle);
-        const { gl } = this.options;
+        const { gl } = this;
         const texture = gl.createTexture();
         if (texture === null) {
             throw new Error("Failed to create new texture.");

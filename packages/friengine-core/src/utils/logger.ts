@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { createLogger, format } from "winston"
 
 export const logger = createLogger({
