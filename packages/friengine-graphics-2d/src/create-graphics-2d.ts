@@ -37,11 +37,12 @@ export function createGraphics2d({
         canvas.height = canvasOptions.height;
     }
     const gl = canvas.getContext("webgl2");
+    const { width, height } = canvasOptions ?? canvas;
     if (!gl) {
         throw new Error("Unable to initialize WebGL context.");
     }
     const imageManager = new ImageManager(resourceManager, imageManagerOptions);
     const textureManager = new TextureManager(resourceManager, imageManager, gl);
-    const graphics2d = new Graphics2d(gl, graphics2dOptions);
+    const graphics2d = new Graphics2d(gl, textureManager, graphics2dOptions ?? { width, height });
     return { resourceManager, imageManager, textureManager, canvas, graphics2d };
 }

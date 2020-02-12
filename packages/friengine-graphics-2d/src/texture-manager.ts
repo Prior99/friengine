@@ -5,9 +5,16 @@ export interface TextureLoadOptions {
     imageHandle: ResourceHandle<HTMLImageElement>;
 }
 
+export interface Texture {
+    texture: WebGLTexture;
+    imageHandle: ResourceHandle<HTMLImageElement>;
+    width: number;
+    height: number;
+}
+
 export const RESOURCE_TYPE_TEXTURE = Symbol("ResourceTypeTexture");
 
-export class TextureManager extends SpecificResourceManager<TextureLoadOptions, WebGLTexture> {
+export class TextureManager extends SpecificResourceManager<TextureLoadOptions, Texture> {
     static add(url: string): ResourceHandle<HTMLImageElement> {
         const imageHandle = ImageManager.add(url);
         return ResourceManager.add({
@@ -31,8 +38,9 @@ export class TextureManager extends SpecificResourceManager<TextureLoadOptions, 
         super(resourceManager);
     }
 
-    protected async loader({ imageHandle }: TextureLoadOptions): Promise<WebGLTexture> {
+    protected async loader({ imageHandle }: TextureLoadOptions): Promise<Texture> {
         const image = this.imageManager.get(imageHandle);
+        const { width, height } = image;
         const { gl } = this;
         const texture = gl.createTexture();
         if (texture === null) {
@@ -44,10 +52,15 @@ export class TextureManager extends SpecificResourceManager<TextureLoadOptions, 
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
         gl.generateMipmap(gl.TEXTURE_2D);
         gl.bindTexture(gl.TEXTURE_2D, null);
-        return texture;
+        return {
+            texture,
+            width,
+            height,
+            imageHandle
+        };
     }
 
-    public load(handle: ResourceHandle<WebGLTexture>): Resource<WebGLTexture> {
+    public load(handle: ResourceHandle<WebGLTexture>): Resource<Texture> {
         const resource = super.load(handle);
         this.imageManager.loadAllKnownHandles(resource.dependencies);
         return resource;

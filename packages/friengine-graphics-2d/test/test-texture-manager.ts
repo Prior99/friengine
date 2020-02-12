@@ -77,7 +77,12 @@ describe("TextureManager", () => {
 
                     it("calls generateMipmap", () => expect(mockGl.generateMipmap).toHaveBeenCalled());
 
-                    it("can get the texture", () => expect(textureManager.get(handle)).toBe(texture));
+                    it("can get the texture", () => expect(textureManager.get(handle)).toEqual({
+                        texture,
+                        width: 0,
+                        height: 0,
+                        imageHandle: { symbol: expect.anything() },
+                    }));
                 });
             });
         });
