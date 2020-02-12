@@ -42,6 +42,9 @@ export class Graphics2d {
         protected textureManager: TextureManager,
         protected options: Graphics2dOptions,
     ) {
+        gl.disable(gl.DEPTH_TEST);
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         gl.viewport(0, 0, options.width, options.height);
         this.vbo = gl.createBuffer()!;
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
@@ -101,10 +104,8 @@ export class Graphics2d {
 
     public drawTexture({ textureHandle, srcPosition, destPosition, srcDimensions, destDimensions }: DrawTextureOptions): void {
         const { gl } = this;
-        const { attributes, program } = this.shader;
+        const { attributes } = this.shader;
         const { texture, width, height } = this.textureManager.get(textureHandle);
-
-        gl.useProgram(program);
 
         const textureDimensions = vec2(width, height);
         this.uniform2f("destDimensions", destDimensions ?? textureDimensions);
@@ -126,6 +127,8 @@ export class Graphics2d {
 
     public render(c: () => void): void {
         const { gl } = this;
+
+        gl.useProgram(this.shader.program);
 
         gl.clearColor(0, 0, 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);

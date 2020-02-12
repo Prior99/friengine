@@ -32,6 +32,14 @@ describe("Graphics2d", () => {
                     srcPosition: vec2(10, 10),
                     srcDimensions: vec2(44, 44),
                 });
+                graphics2d.drawTexture({
+                    textureHandle,
+                    destPosition: vec2(100, 50),
+                });
+                graphics2d.drawTexture({
+                    textureHandle,
+                    destPosition: vec2(50, 40),
+                });
             });
         });
 
