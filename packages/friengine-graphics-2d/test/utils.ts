@@ -1,4 +1,4 @@
-import { encode } from "node-libpng";
+import { encode, readPngFile } from "node-libpng";
 import { createWebGLRenderingContext } from "node-gles";
 
 export interface GlTestConfig {
@@ -28,6 +28,14 @@ export function toPng(
     const pixels = new Uint32Array(width * height * (alpha ? 4 : 3));
     gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_INT, pixels);
     const raw = Buffer.from(pixels);
-    console.log(new Uint8Array(raw));
     return encode(raw, { width, height });
+}
+
+export async function loadImage(path: string): Promise<HTMLImageElement> {
+    const { width, height, data } = await readPngFile(path);
+    return {
+        data: Uint8ClampedArray.from(data),
+        width,
+        height,
+    } as any;
 }

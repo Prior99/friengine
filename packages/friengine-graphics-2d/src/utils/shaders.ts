@@ -19,9 +19,10 @@ export const defaultFragmentShaderSource: string = frag`
 
     varying vec2 textureCoords;
 
+    const vec2 adjust = vec2(0.5, 0.5);
+
     void main() {
-        // gl_FragColor = texture2D(colors, textureCoords);
-        gl_FragColor = vec4(1.0, 0, 0, 1.0);
+        gl_FragColor = texture2D(colors, textureCoords * adjust + adjust);
     }
 `;
 
@@ -34,7 +35,7 @@ export const defaultVertexShaderSource: string = vert`
 
 
     void main() {
-        textureCoords  = vertexPosition;
+        textureCoords = vertexPosition;
         gl_Position = vec4(vertexPosition, 0.0, 1.0);
     }
 `;
