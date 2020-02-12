@@ -18,10 +18,6 @@
         "preset": "../../jest-defaults.json",
         "setupFilesAfterEnv": [
             "<rootDir>/test/setup.ts"
-        ],
-        "reporters": [
-            "default",
-            "jest-screenshot/reporter"
         ]
     },
     "devDependencies": {

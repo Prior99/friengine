@@ -1,6 +1,14 @@
 import { defaultVertexShaderSource, defaultFragmentShaderSource, loadShader } from "./utils";
 import { TextureManager } from "./texture-manager";
-import { ResourceHandle, Vec2 } from "friengine-core/src";
+import { ResourceHandle, Vec2, vec2, logger } from "friengine-core";
+
+export interface DrawTextureOptions {
+    textureHandle: ResourceHandle<WebGLTexture>;
+    srcPosition?: Vec2;
+    destPosition: Vec2;
+    srcDimensions?: Vec2;
+    destDimensions?: Vec2;
+}
 
 export interface ShaderInfo {
     program: WebGLProgram;
@@ -9,6 +17,12 @@ export interface ShaderInfo {
     };
     uniforms: {
         colors: WebGLUniformLocation;
+        screenDimensions: WebGLUniformLocation;
+        srcDimensions: WebGLUniformLocation;
+        srcPosition: WebGLUniformLocation;
+        destDimensions: WebGLUniformLocation;
+        destPosition: WebGLUniformLocation;
+        textureDimensions: WebGLUniformLocation;
     };
 }
 
@@ -45,19 +59,36 @@ export class Graphics2d {
         if (vertexPosition === -1) {
             throw new Error(`Shader has no attribute named "vertexPosition"`);
         }
-        const colors = gl.getUniformLocation(program, "colors");
-        if (colors === null) {
-            throw new Error(`Shader has no uniform named "colors"`);
-        }
         this.shader = {
             program,
             attributes: {
                 vertexPosition,
             },
             uniforms: {
-                colors,
+                colors: this.getUniformLocation(program, "colors"),
+                srcPosition: this.getUniformLocation(program, "srcPosition"),
+                srcDimensions: this.getUniformLocation(program, "srcDimensions"),
+                destPosition: this.getUniformLocation(program, "destPosition"),
+                destDimensions: this.getUniformLocation(program, "destDimensions"),
+                textureDimensions: this.getUniformLocation(program, "textureDimensions"),
+                screenDimensions: this.getUniformLocation(program, "screenDimensions"),
             },
         };
+        gl.useProgram(program);
+        this.uniform2f("screenDimensions", vec2(options.width, options.height));
+    }
+
+    private getUniformLocation(program: WebGLProgram, name: string): WebGLUniformLocation {
+        const location = this.gl.getUniformLocation(program, name);
+        if (location === null || location === -1) {
+            throw new Error(`Shader has no uniform named "${name}"`);
+        }
+        return location;
+    }
+
+    private uniform2f(uniform: keyof ShaderInfo["uniforms"], vec: Vec2): void {
+        logger.info(`Setting uniform "${uniform}" to vec2(${vec.x}, ${vec.y})`);
+        this.gl.uniform2f(this.shader.uniforms[uniform], vec.x, vec.y);
     }
 
     protected get vertexShaderSource(): string {
@@ -68,14 +99,24 @@ export class Graphics2d {
         return this.options.fragmentShaderSource ?? defaultFragmentShaderSource;
     }
 
-    public drawTexture(textureHandle: ResourceHandle<WebGLTexture>, _pos: Vec2): void {
+    public drawTexture({ textureHandle, srcPosition, destPosition, srcDimensions, destDimensions }: DrawTextureOptions): void {
         const { gl } = this;
-        const { attributes } = this.shader;
+        const { attributes, program } = this.shader;
         const { texture, width, height } = this.textureManager.get(textureHandle);
+
+        gl.useProgram(program);
+
+        const textureDimensions = vec2(width, height);
+        this.uniform2f("destDimensions", destDimensions ?? textureDimensions);
+        this.uniform2f("srcDimensions", srcDimensions ?? textureDimensions);
+        this.uniform2f("srcPosition", srcPosition ?? vec2(0, 0));
+        this.uniform2f("destPosition", destPosition);
+        this.uniform2f("textureDimensions", textureDimensions);
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.uniform1i(this.shader.uniforms.colors, 0);
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
         gl.enableVertexAttribArray(attributes.vertexPosition);
         gl.vertexAttribPointer(attributes.vertexPosition, 2, this.gl.FLOAT, false, 0, 0);
@@ -85,9 +126,6 @@ export class Graphics2d {
 
     public render(c: () => void): void {
         const { gl } = this;
-        const { program, attributes } = this.shader;
-
-        gl.useProgram(program);
 
         gl.clearColor(0, 0, 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);

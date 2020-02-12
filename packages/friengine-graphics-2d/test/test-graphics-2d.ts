@@ -1,5 +1,5 @@
 import { ResourceManager, vec2, ResourceHandle } from "friengine-core";
-import { Graphics2d, TextureManager, ImageManager } from "../src";
+import { Graphics2d, TextureManager, ImageManager, Texture } from "../src";
 import { toPng, createGl, loadImage } from "./utils";
 import * as path from "path";
 
@@ -9,7 +9,7 @@ describe("Graphics2d", () => {
     let resourceManager: ResourceManager;
     let imageManager: ImageManager;
     let textureManager: TextureManager;
-    let textureHandle: ResourceHandle<HTMLImageElement>;
+    let textureHandle: ResourceHandle<Texture>;
 
     beforeEach(async () => {
         gl = createGl();
@@ -26,7 +26,12 @@ describe("Graphics2d", () => {
     describe("rendering a texture", () => {
         beforeEach(() => {
             graphics2d.render(() => {
-                graphics2d.drawTexture(textureHandle, vec2(0 ,0));
+                graphics2d.drawTexture({
+                    textureHandle,
+                    destPosition: vec2(10, 20),
+                    srcPosition: vec2(10, 10),
+                    srcDimensions: vec2(44, 44),
+                });
             });
         });
 

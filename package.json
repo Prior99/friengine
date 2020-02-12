@@ -9,7 +9,11 @@
   "private": true,
   "jest": {
     "projects": ["packages/*"],
-    "preset": "./jest-defaults.json"
+    "preset": "./jest-defaults.json",
+    "reporters": [
+        "default",
+        "jest-screenshot/reporter"
+    ]
   },
   "devDependencies": {
     "jest": "^25.1.0",
