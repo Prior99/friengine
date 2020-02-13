@@ -51,7 +51,10 @@ export class Graphics2d {
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, 1, 1, 1, -1, -1, 1, 1, 1, -1, -1, -1]), gl.STATIC_DRAW);
         const vertexShader = loadShader(gl, gl.VERTEX_SHADER, this.vertexShaderSource);
         const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, this.fragmentShaderSource);
-        const program = gl.createProgram()!;
+        const program = gl.createProgram();
+        if (!program) {
+            throw new Error("Unable to create shader program.");
+        }
         gl.attachShader(program, vertexShader);
         gl.attachShader(program, fragmentShader);
         gl.linkProgram(program);

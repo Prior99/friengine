@@ -75,8 +75,6 @@ describe("TextureManager", () => {
 
                     it("calls texParameteri", () => expect(mockGl.texParameteri).toHaveBeenCalled());
 
-                    it("calls generateMipmap", () => expect(mockGl.generateMipmap).toHaveBeenCalled());
-
                     it("can get the texture", () => expect(textureManager.get(handle)).toEqual({
                         texture,
                         width: 0,
