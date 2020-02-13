@@ -1,7 +1,7 @@
 {
-    "name": "friengine-graphics-2d",
+    "name": "friengine-graphics",
     "version": "0.0.0",
-    "description": "WebGL based 2D graphics for friengine.",
+    "description": "WebGL based graphics for friengine.",
     "main": "dist/index.js",
     "author": "Frederick Gnodtke",
     "license": "MIT",

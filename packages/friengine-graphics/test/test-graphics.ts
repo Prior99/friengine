@@ -1,10 +1,10 @@
 import { ResourceManager, vec2, ResourceHandle } from "friengine-core";
-import { Graphics2d, TextureManager, ImageManager, Texture } from "../src";
+import { Graphics, TextureManager, ImageManager, Texture } from "../src";
 import { toPng, createGl, loadImage } from "./utils";
 import * as path from "path";
 
-describe("Graphics2d", () => {
-    let graphics2d: Graphics2d;
+describe("Graphics", () => {
+    let graphics2d: Graphics;
     let gl: WebGL2RenderingContext;
     let resourceManager: ResourceManager;
     let imageManager: ImageManager;
@@ -16,7 +16,7 @@ describe("Graphics2d", () => {
         resourceManager = new ResourceManager();
         imageManager = new ImageManager(resourceManager, { loadImage });
         textureManager = new TextureManager(resourceManager, imageManager, gl);
-        graphics2d = new Graphics2d(gl, textureManager, { width: 320, height: 240 });
+        graphics2d = new Graphics(gl, textureManager, { width: 320, height: 240 });
 
         textureHandle = TextureManager.add(path.join(__dirname, "assets", "test.png"));
         textureManager.load(textureHandle);

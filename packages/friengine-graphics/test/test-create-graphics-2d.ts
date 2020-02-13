@@ -1,10 +1,10 @@
 import { ResourceManager } from "friengine-core";
-import { Graphics2dParts, createGraphics2d, ImageManager, TextureManager, createCanvas } from "../src";
+import { GraphicsParts, createGraphics, ImageManager, TextureManager, createCanvas } from "../src";
 
 jest.mock("../src/image-manager");
 jest.mock("../src/utils/create-canvas");
-jest.mock("../src/graphics-2d", () => ({
-    Graphics2d: class {},
+jest.mock("../src/graphics", () => ({
+    Graphics: class {},
 }));
 
 describe("createGraphics2d", () => {
@@ -25,16 +25,16 @@ describe("createGraphics2d", () => {
         describe("with image manager options", () => {
             const loadImage = (() => undefined) as any;
 
-            beforeEach(() => createGraphics2d({ imageManagerOptions: { loadImage } }));
+            beforeEach(() => createGraphics({ imageManagerOptions: { loadImage } }));
 
             it("passes through the options", () =>
                 expect(ImageManager).toHaveBeenCalledWith(expect.any(ResourceManager), { loadImage }));
         });
 
         describe("with canvas options", () => {
-            let parts: Graphics2dParts;
+            let parts: GraphicsParts;
 
-            beforeEach(() => parts = createGraphics2d({ canvasOptions: { width: 20, height: 10 } }));
+            beforeEach(() => parts = createGraphics({ canvasOptions: { width: 20, height: 10 } }));
 
             it("assigns the width", () => expect(parts.canvas.width).toBe(20));
 
@@ -42,13 +42,13 @@ describe("createGraphics2d", () => {
         });
 
         describe("with canvas", () => {
-            let parts: Graphics2dParts;
+            let parts: GraphicsParts;
             let canvas: HTMLCanvasElement;
 
             beforeEach(() => {
                 canvas = createCanvas(10, 10);
                 spyCreateCanvas.mockClear();
-                parts = createGraphics2d({ canvas });
+                parts = createGraphics({ canvas });
             });
 
             it("uses the canvas", () => expect(parts.canvas).toBe(canvas));
@@ -57,21 +57,21 @@ describe("createGraphics2d", () => {
         });
 
         describe("with resource manager", () => {
-            let parts: Graphics2dParts;
+            let parts: GraphicsParts;
             let resourceManager: ResourceManager;
 
             beforeEach(() => {
                 resourceManager = new ResourceManager();
-                parts = createGraphics2d({ resourceManager });
+                parts = createGraphics({ resourceManager });
             });
 
             it("uses the resource manager", () => expect(parts.resourceManager).toBe(resourceManager));
         });
 
         describe("with no arguments", () => {
-            let parts: Graphics2dParts;
+            let parts: GraphicsParts;
 
-            beforeEach(() => parts = createGraphics2d());
+            beforeEach(() => parts = createGraphics());
 
             it("creates resource manager", () => expect(parts.resourceManager).toBeInstanceOf(ResourceManager));
 
@@ -96,7 +96,7 @@ describe("createGraphics2d", () => {
         });
 
         it("throws", () =>
-            expect(() => createGraphics2d()).toThrowErrorMatchingInlineSnapshot(
+            expect(() => createGraphics()).toThrowErrorMatchingInlineSnapshot(
                 `"Unable to initialize WebGL context."`,
             ));
     });

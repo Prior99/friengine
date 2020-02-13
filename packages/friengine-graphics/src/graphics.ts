@@ -11,20 +11,20 @@ export interface DrawTextureOptions {
     destDimensions?: Vec2;
 }
 
-export interface Graphics2dOptions {
+export interface GraphicsOptions {
     width: number;
     height: number;
 }
 
 
-export class Graphics2d {
+export class Graphics {
     private vbo: WebGLBuffer;
     private shader!: Shader2d;
 
     constructor(
         public gl: WebGL2RenderingContext,
         protected textureManager: TextureManager,
-        protected options: Graphics2dOptions,
+        protected options: GraphicsOptions,
     ) {
         gl.disable(gl.DEPTH_TEST);
         gl.enable(gl.BLEND);

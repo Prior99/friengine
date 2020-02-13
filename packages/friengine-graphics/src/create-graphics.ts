@@ -2,14 +2,14 @@ import { ResourceManager } from "friengine-core";
 import { ImageManager, ImageManagerOptions } from "./image-manager";
 import { TextureManager } from "./texture-manager";
 import { createCanvas } from "./utils";
-import { Graphics2d, Graphics2dOptions } from "./graphics-2d";
+import { Graphics, GraphicsOptions } from "./graphics";
 
-export interface Graphics2dParts {
+export interface GraphicsParts {
     resourceManager: ResourceManager,
     imageManager: ImageManager;
     textureManager: TextureManager;
     canvas: HTMLCanvasElement;
-    graphics2d: Graphics2d;
+    graphics: Graphics;
 }
 
 export interface CanvasOptions {
@@ -17,21 +17,21 @@ export interface CanvasOptions {
     height: number;
 }
 
-export interface CreateGraphics2dOptions {
+export interface CreateGraphicsOptions {
     resourceManager?: ResourceManager;
     canvas?: HTMLCanvasElement;
     imageManagerOptions?: ImageManagerOptions;
     canvasOptions?: CanvasOptions;
-    graphics2dOptions?: Graphics2dOptions;
+    graphicsOptions?: GraphicsOptions;
 }
 
-export function createGraphics2d({
+export function createGraphics({
     resourceManager = new ResourceManager(),
     canvas = createCanvas(0, 0),
     imageManagerOptions,
     canvasOptions,
-    graphics2dOptions,
-}: CreateGraphics2dOptions = {}): Graphics2dParts {
+    graphicsOptions,
+}: CreateGraphicsOptions = {}): GraphicsParts {
     if (canvasOptions) {
         canvas.width = canvasOptions.width;
         canvas.height = canvasOptions.height;
@@ -43,6 +43,6 @@ export function createGraphics2d({
     }
     const imageManager = new ImageManager(resourceManager, imageManagerOptions);
     const textureManager = new TextureManager(resourceManager, imageManager, gl);
-    const graphics2d = new Graphics2d(gl, textureManager, graphics2dOptions ?? { width, height });
-    return { resourceManager, imageManager, textureManager, canvas, graphics2d };
+    const graphics = new Graphics(gl, textureManager, graphicsOptions ?? { width, height });
+    return { resourceManager, imageManager, textureManager, canvas, graphics };
 }

@@ -1,10 +1,10 @@
-import { Graphics2dOptions } from "../graphics-2d";
+import { GraphicsOptions } from "../graphics";
 
 export abstract class GraphicsLayer {
     protected gl: WebGL2RenderingContext | undefined;
-    protected options: Graphics2dOptions | undefined;
+    protected options: GraphicsOptions | undefined;
 
-    public initialize(gl: WebGL2RenderingContext, options: Graphics2dOptions): void {
+    public initialize(gl: WebGL2RenderingContext, options: GraphicsOptions): void {
         this.gl = gl;
         this.options = options;
     }
