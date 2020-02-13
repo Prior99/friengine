@@ -1,6 +1,7 @@
 import { TextureManager } from "./texture-manager";
 import { ResourceHandle, Vec2, vec2 } from "friengine-core";
-import { Shader, Default2dShader } from "./shaders";
+import { DefaultShader2d } from "./shaders";
+import { Shader2d } from "./shaders";
 
 export interface DrawTextureOptions {
     textureHandle: ResourceHandle<WebGLTexture>;
@@ -18,7 +19,7 @@ export interface Graphics2dOptions {
 
 export class Graphics2d {
     private vbo: WebGLBuffer;
-    private shader!: Default2dShader;
+    private shader!: Shader2d;
 
     constructor(
         public gl: WebGL2RenderingContext,
@@ -32,7 +33,7 @@ export class Graphics2d {
         this.vbo = gl.createBuffer()!;
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, 1, 1, 1, -1, -1, 1, 1, 1, -1, -1, -1]), gl.STATIC_DRAW);
-        this.shader = new Default2dShader(gl);
+        this.shader = new DefaultShader2d(gl);
         gl.useProgram(this.shader.program);
         this.shader.uniform2f("screenDimensions", vec2(options.width, options.height));
     }

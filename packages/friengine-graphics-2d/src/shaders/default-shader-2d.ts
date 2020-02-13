@@ -1,5 +1,6 @@
 import { Shader, ShaderSources } from "./shader";
 import { frag, vert } from "./utils";
+import { shader2dAttributes, shader2dUniforms, Shader2d } from "./shader-2d";
 
 export const fragmentShader: string = frag`
     precision mediump float;
@@ -52,26 +53,15 @@ export const vertexShader: string = vert`
     }
 `;
 
-const uniforms = [
-    "colors",
-    "srcPosition",
-    "srcDimensions",
-    "destPosition",
-    "destDimensions",
-    "textureDimensions",
-    "screenDimensions",
-] as const;
-const attributes = ["vertexPosition"] as const;
-
-export class Default2dShader extends Shader<typeof attributes, typeof uniforms> {
+export class DefaultShader2d extends Shader<typeof shader2dAttributes, typeof shader2dUniforms> implements Shader2d {
     constructor(gl: WebGL2RenderingContext, sources: Partial<ShaderSources> = {}) {
         super(gl, {
-            uniforms,
-            attributes,
+            attributes: shader2dAttributes,
+            uniforms: shader2dUniforms,
             sources: {
                 fragmentShader: sources.fragmentShader ?? fragmentShader,
                 vertexShader: sources.vertexShader ?? vertexShader,
             },
-        })
+        });
     }
 }
