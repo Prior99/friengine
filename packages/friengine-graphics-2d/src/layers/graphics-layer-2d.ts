@@ -33,10 +33,7 @@ export abstract class GraphicsLayer2d extends GraphicsLayer implements ResourceD
         destDimensions,
     }: ResourceDrawOptions2d<Texture>): void {
         const { gl } = this;
-        const { attributes } = this.shader;
         const { texture, width, height } = this.textureManager.get(handle);
-
-        gl.useProgram(this.shader.program);
 
         const textureDimensions = vec2(width, height);
         this.shader.uniform2f("destDimensions", destDimensions ?? textureDimensions);
@@ -49,12 +46,18 @@ export abstract class GraphicsLayer2d extends GraphicsLayer implements ResourceD
         gl.bindTexture(gl.TEXTURE_2D, texture);
         this.shader.uniform1i("colors", 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
-        gl.enableVertexAttribArray(attributes.vertexPosition);
-        gl.vertexAttribPointer(attributes.vertexPosition, 2, this.gl.FLOAT, false, 0, 0);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
 
     protected abstract render(): void;
+
+    public redraw(): void {
+        const { gl } = this;
+        const { attributes } = this.shader;
+        gl.useProgram(this.shader.program);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+        gl.enableVertexAttribArray(attributes.vertexPosition);
+        gl.vertexAttribPointer(attributes.vertexPosition, 2, this.gl.FLOAT, false, 0, 0);
+        super.redraw();
+    }
 }
