@@ -1,6 +1,7 @@
-import { defaultVertexShaderSource, defaultFragmentShaderSource, loadShader } from "./utils";
+import { defaultVertexShaderSource, defaultFragmentShaderSource, compileShader } from "./utils";
 import { TextureManager } from "./texture-manager";
 import { ResourceHandle, Vec2, vec2, logger } from "friengine-core";
+import { Shader } from "./shader";
 
 export interface DrawTextureOptions {
     textureHandle: ResourceHandle<WebGLTexture>;
@@ -10,22 +11,6 @@ export interface DrawTextureOptions {
     destDimensions?: Vec2;
 }
 
-export interface ShaderInfo {
-    program: WebGLProgram;
-    attributes: {
-        vertexPosition: number;
-    };
-    uniforms: {
-        colors: WebGLUniformLocation;
-        screenDimensions: WebGLUniformLocation;
-        srcDimensions: WebGLUniformLocation;
-        srcPosition: WebGLUniformLocation;
-        destDimensions: WebGLUniformLocation;
-        destPosition: WebGLUniformLocation;
-        textureDimensions: WebGLUniformLocation;
-    };
-}
-
 export interface Graphics2dOptions {
     vertexShaderSource?: string;
     fragmentShaderSource?: string;
@@ -33,9 +18,20 @@ export interface Graphics2dOptions {
     height: number;
 }
 
+const uniforms = [
+    "colors",
+    "srcPosition",
+    "srcDimensions",
+    "destPosition",
+    "destDimensions",
+    "textureDimensions",
+    "screenDimensions",
+] as const;
+const attributes = ["vertexPosition"] as const;
+
 export class Graphics2d {
     private vbo: WebGLBuffer;
-    private shader!: ShaderInfo;
+    private shader!: Shader<typeof attributes, typeof uniforms>;
 
     constructor(
         public gl: WebGL2RenderingContext,
@@ -49,52 +45,16 @@ export class Graphics2d {
         this.vbo = gl.createBuffer()!;
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, 1, 1, 1, -1, -1, 1, 1, 1, -1, -1, -1]), gl.STATIC_DRAW);
-        const vertexShader = loadShader(gl, gl.VERTEX_SHADER, this.vertexShaderSource);
-        const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, this.fragmentShaderSource);
-        const program = gl.createProgram();
-        if (!program) {
-            throw new Error("Unable to create shader program.");
-        }
-        gl.attachShader(program, vertexShader);
-        gl.attachShader(program, fragmentShader);
-        gl.linkProgram(program);
-        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-            throw new Error("Unable to link shader program.");
-        }
-        const vertexPosition = gl.getAttribLocation(program, "vertexPosition");
-        if (vertexPosition === -1) {
-            throw new Error(`Shader has no attribute named "vertexPosition"`);
-        }
-        this.shader = {
-            program,
-            attributes: {
-                vertexPosition,
+        this.shader = new Shader(gl, {
+            uniforms,
+            attributes,
+            sources: {
+                fragmentShader: options.fragmentShaderSource ?? defaultFragmentShaderSource,
+                vertexShader: options.vertexShaderSource ?? defaultVertexShaderSource,
             },
-            uniforms: {
-                colors: this.getUniformLocation(program, "colors"),
-                srcPosition: this.getUniformLocation(program, "srcPosition"),
-                srcDimensions: this.getUniformLocation(program, "srcDimensions"),
-                destPosition: this.getUniformLocation(program, "destPosition"),
-                destDimensions: this.getUniformLocation(program, "destDimensions"),
-                textureDimensions: this.getUniformLocation(program, "textureDimensions"),
-                screenDimensions: this.getUniformLocation(program, "screenDimensions"),
-            },
-        };
-        gl.useProgram(program);
-        this.uniform2f("screenDimensions", vec2(options.width, options.height));
-    }
-
-    private getUniformLocation(program: WebGLProgram, name: string): WebGLUniformLocation {
-        const location = this.gl.getUniformLocation(program, name);
-        if (location === null || location === -1) {
-            throw new Error(`Shader has no uniform named "${name}"`);
-        }
-        return location;
-    }
-
-    private uniform2f(uniform: keyof ShaderInfo["uniforms"], vec: Vec2): void {
-        logger.info(`Setting uniform "${uniform}" to vec2(${vec.x}, ${vec.y})`);
-        this.gl.uniform2f(this.shader.uniforms[uniform], vec.x, vec.y);
+        });
+        gl.useProgram(this.shader.program);
+        this.shader.uniform2f("screenDimensions", vec2(options.width, options.height));
     }
 
     protected get vertexShaderSource(): string {
@@ -105,21 +65,27 @@ export class Graphics2d {
         return this.options.fragmentShaderSource ?? defaultFragmentShaderSource;
     }
 
-    public drawTexture({ textureHandle, srcPosition, destPosition, srcDimensions, destDimensions }: DrawTextureOptions): void {
+    public drawTexture({
+        textureHandle,
+        srcPosition,
+        destPosition,
+        srcDimensions,
+        destDimensions,
+    }: DrawTextureOptions): void {
         const { gl } = this;
         const { attributes } = this.shader;
         const { texture, width, height } = this.textureManager.get(textureHandle);
 
         const textureDimensions = vec2(width, height);
-        this.uniform2f("destDimensions", destDimensions ?? textureDimensions);
-        this.uniform2f("srcDimensions", srcDimensions ?? textureDimensions);
-        this.uniform2f("srcPosition", srcPosition ?? vec2(0, 0));
-        this.uniform2f("destPosition", destPosition);
-        this.uniform2f("textureDimensions", textureDimensions);
+        this.shader.uniform2f("destDimensions", destDimensions ?? textureDimensions);
+        this.shader.uniform2f("srcDimensions", srcDimensions ?? textureDimensions);
+        this.shader.uniform2f("srcPosition", srcPosition ?? vec2(0, 0));
+        this.shader.uniform2f("destPosition", destPosition);
+        this.shader.uniform2f("textureDimensions", textureDimensions);
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.uniform1i(this.shader.uniforms.colors, 0);
+        this.shader.uniform1i("colors", 0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
         gl.enableVertexAttribArray(attributes.vertexPosition);
