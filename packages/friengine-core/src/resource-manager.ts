@@ -151,6 +151,10 @@ export class ResourceManager {
         return this.search({ filter: resource => this.isResourceLoadable(resource) }) as UnfinishedResource<unknown>[];
     }
 
+    public resourceDone(handle: ResourceHandle<unknown>): boolean {
+        return this.getResource(handle).status === LoadStatus.DONE;
+    }
+
     public isResourceLoadable(resource: Resource<unknown>): boolean {
         if (resource.status !== LoadStatus.PENDING) {
             return false;

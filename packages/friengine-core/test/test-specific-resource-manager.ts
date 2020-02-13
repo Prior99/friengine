@@ -80,7 +80,7 @@ describe("SpecificResourceManager", () => {
             it("called the loader only once", () => expect(loadFn1).toHaveBeenCalledTimes(1));
 
             it("called the loader for the correct handle", () =>
-                expect(loadFn1).toHaveBeenCalledWith({ value: "value 1" }));
+                expect(loadFn1).toHaveBeenCalledWith({ value: "value 1" }, expect.anything()));
         });
 
         describe("when loading resources individually", () => {

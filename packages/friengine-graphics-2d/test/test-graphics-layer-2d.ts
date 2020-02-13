@@ -1,17 +1,16 @@
 import { ResourceManager, ResourceHandle, vec2 } from "friengine-core";
 import { GraphicsLayer2d } from "../src";
-import { Graphics, ImageManager, TextureManager, Texture } from "friengine-graphics";
-import { createGl, loadImage, toPng } from "friengine-test-utils";
+import { Graphics, TextureManager, Texture } from "friengine-graphics";
+import { toPng, createTestGraphics } from "friengine-test-utils";
 import * as path from "path";
 
-describe("Graphics", () => {
+describe("GraphicsLayer2d", () => {
     let graphics: Graphics;
-    let gl: WebGL2RenderingContext;
     let resourceManager: ResourceManager;
-    let imageManager: ImageManager;
     let textureManager: TextureManager;
     let testLayer: TestLayer;
     let handle: ResourceHandle<Texture>;
+    let gl: WebGL2RenderingContext;
 
     class TestLayer extends GraphicsLayer2d {
         public render(): void {
@@ -33,11 +32,11 @@ describe("Graphics", () => {
     }
 
     beforeEach(async () => {
-        gl = createGl();
-        resourceManager = new ResourceManager();
-        imageManager = new ImageManager(resourceManager, { loadImage });
-        textureManager = new TextureManager(resourceManager, imageManager, gl);
-        graphics = new Graphics(gl, textureManager, { width: 320, height: 240 });
+        const parts = createTestGraphics();
+        gl = parts.gl;
+        resourceManager = parts.resourceManager;
+        textureManager = parts.textureManager;
+        graphics = parts.graphics;
         testLayer = new TestLayer();
         graphics.addLayer(testLayer);
 

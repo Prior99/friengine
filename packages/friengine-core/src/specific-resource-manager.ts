@@ -23,7 +23,9 @@ export interface SpecificResourceManager<TData> {
     loadAllKnownHandles(handles: ResourceHandle<unknown>[]): Resource<TData>[];
 }
 
-export abstract class BaseSpecificResourceManager<TOptions, TData> implements SpecificResourceManager<TData>{
+export abstract class BaseSpecificResourceManager<TOptions, TData, TMeta = {}> implements SpecificResourceManager<TData>{
+    protected meta = new Map<symbol, TMeta>();
+
     constructor(public resourceManager: ResourceManager) {}
 
     public async waitUntilFinished(): Promise<DoneResource<TData>[]> {
@@ -34,7 +36,7 @@ export abstract class BaseSpecificResourceManager<TOptions, TData> implements Sp
         );
     }
 
-    protected abstract loader(options: TOptions): Promise<LoadResult<TData>>;
+    protected abstract loader(options: TOptions, handle: ResourceHandle<TData>): Promise<LoadResult<TData>>;
     protected readonly abstract resourceType: symbol;
 
     public get(resourceHandle: ResourceHandle<TData>): TData {
@@ -46,7 +48,7 @@ export abstract class BaseSpecificResourceManager<TOptions, TData> implements Sp
     }
 
     public load(handle: ResourceHandle<TData>): Resource<TData> {
-        return this.resourceManager.load(handle, (options: TOptions) => this.loader(options));
+        return this.resourceManager.load(handle, (options: TOptions) => this.loader(options, handle));
     }
 
     public loadAll(): Resource<TData>[] {

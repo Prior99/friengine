@@ -8,8 +8,8 @@ export interface SpriteDrawOptions {
     destDimensions?: Vec2;
 }
 
-export abstract class Sprite<TResource> {
+export abstract class Sprite<TResource, TOptions extends SpriteDrawOptions = SpriteDrawOptions> {
     constructor(protected handle: ResourceHandle<TResource>) {}
 
-    public abstract draw(target: ResourceDrawer2d<TResource>): void;
+    public abstract draw(target: ResourceDrawer2d<TResource>, options: TOptions): void;
 }
