@@ -1,4 +1,4 @@
-import { ResourceManager, ResourceHandle, SpecificResourceManager, Resource } from "friengine-core";
+import { ResourceManager, ResourceHandle, BaseSpecificResourceManager, Resource } from "friengine-core";
 import { ImageManager } from "./image-manager";
 
 export interface TextureLoadOptions {
@@ -14,7 +14,7 @@ export interface Texture {
 
 export const RESOURCE_TYPE_TEXTURE = Symbol("ResourceTypeTexture");
 
-export class TextureManager extends SpecificResourceManager<TextureLoadOptions, Texture> {
+export class TextureManager extends BaseSpecificResourceManager<TextureLoadOptions, Texture> {
     static add(url: string): ResourceHandle<HTMLImageElement> {
         const imageHandle = ImageManager.add(url);
         return ResourceManager.add({

@@ -1,4 +1,4 @@
-import { ResourceManager, ResourceHandle, SpecificResourceManager, Resource } from "friengine-core";
+import { ResourceManager, ResourceHandle, BaseSpecificResourceManager, Resource } from "friengine-core";
 import { TextureManager } from "friengine-graphics";
 import { Sprite } from "./sprite";
 
@@ -8,7 +8,7 @@ export interface SpriteLoadOptions {
     url: string;
 }
 
-export class SpriteManager<TResource> extends SpecificResourceManager<SpriteLoadOptions, Sprite<TResource>> {
+export class SpriteManager<TResource> extends BaseSpecificResourceManager<SpriteLoadOptions, Sprite<TResource>> {
 
     static get allHandles(): ResourceHandle<HTMLImageElement>[] {
         return ResourceManager.getHandlesForType(RESOURCE_TYPE_SPRITE);

@@ -1,4 +1,4 @@
-import { ResourceManager, ResourceHandle, SpecificResourceManager } from "friengine-core";
+import { ResourceManager, ResourceHandle, BaseSpecificResourceManager } from "friengine-core";
 import { LoadImage, loadImage as defaultLoadImage } from "./utils";
 
 export interface ImageManagerOptions {
@@ -11,7 +11,7 @@ export interface ImageLoadOptions {
 
 export const RESOURCE_TYPE_IMAGE = Symbol("ResourceTypeImage");
 
-export class ImageManager extends SpecificResourceManager<ImageLoadOptions, HTMLImageElement> {
+export class ImageManager extends BaseSpecificResourceManager<ImageLoadOptions, HTMLImageElement> {
     static add(url: string): ResourceHandle<HTMLImageElement> {
         return ResourceManager.add({
             type: RESOURCE_TYPE_IMAGE,

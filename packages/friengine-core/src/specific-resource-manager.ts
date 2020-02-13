@@ -8,12 +8,22 @@ import {
 import { Constructable } from "./types";
 
 export interface SpecificResourceManagerConfig<TData, TOptions> {
-    superClass: Constructable<SpecificResourceManager<TData, TOptions>, [ResourceManager]>;
+    superClass: Constructable<BaseSpecificResourceManager<TData, TOptions>, [ResourceManager]>;
     add: (args: Omit<ResourceLoader<TOptions>, "type">) => ResourceHandle<TData>;
     allHandles: () => ResourceHandle<TData>[];
 }
 
-export abstract class SpecificResourceManager<TOptions, TData> {
+export interface SpecificResourceManager<TData> {
+    waitUntilFinished(): Promise<DoneResource<TData>[]>;
+    get(resourceHandle: ResourceHandle<TData>): TData;
+    getResource(resourceHandle: ResourceHandle<TData>): Resource<TData>;
+    load(handle: ResourceHandle<TData>): Resource<TData>;
+    loadAll(): Resource<TData>[];
+    isKnownHandle(handle: ResourceHandle<unknown>): handle is ResourceHandle<TData>;
+    loadAllKnownHandles(handles: ResourceHandle<unknown>[]): Resource<TData>[];
+}
+
+export abstract class BaseSpecificResourceManager<TOptions, TData> implements SpecificResourceManager<TData>{
     constructor(public resourceManager: ResourceManager) {}
 
     public async waitUntilFinished(): Promise<DoneResource<TData>[]> {

@@ -1,9 +1,9 @@
 import {
     ResourceHandle,
     ResourceManager,
-    SpecificResourceManager,
     Constructable,
     LoadStatus,
+    BaseSpecificResourceManager,
 } from "../src";
 
 describe("SpecificResourceManager", () => {
@@ -11,7 +11,7 @@ describe("SpecificResourceManager", () => {
         value: string;
     }
 
-    type TestManager = SpecificResourceManager<string, TestOptions>;
+    type TestManager = BaseSpecificResourceManager<string, TestOptions>;
 
     let resourceType1: symbol;
     let resourceType2: symbol;
@@ -29,12 +29,12 @@ describe("SpecificResourceManager", () => {
         loadFn1 = jest.fn(({ value }) => new Promise(resolve => setTimeout(() => resolve(value))));
         loadFn2 = jest.fn(({ value }) => new Promise(resolve => setTimeout(() => resolve(value))));
 
-        TestManager1 = class extends SpecificResourceManager<string, TestOptions> {
+        TestManager1 = class extends BaseSpecificResourceManager<string, TestOptions> {
             protected readonly resourceType = resourceType1;
             protected loader = loadFn1;
         };
 
-        TestManager2 = class extends SpecificResourceManager<string, TestOptions> {
+        TestManager2 = class extends BaseSpecificResourceManager<string, TestOptions> {
             protected readonly resourceType = resourceType2;
             protected loader = loadFn2;
         };
