@@ -1,5 +1,5 @@
 import { EcsParts, createEcs, Entity, CreateEntityOptions, ComponentClass } from "../src";
-import { createComponent } from "./factories";
+import { createComponent } from "friengine-test-utils";
 import { EntityManagerForwarder } from "../src/entity-manager-forwarder";
 
 describe("EntityManagerForwarder", () => {

@@ -1,6 +1,5 @@
-import { Shader, ShaderSources } from "./shader";
-import { frag, vert } from "./utils";
 import { shader2dAttributes, shader2dUniforms, Shader2d } from "./shader-2d";
+import { frag, vert, Shader, ShaderSources } from "friengine-graphics";
 
 export const fragmentShader: string = frag`
     precision mediump float;

@@ -1,5 +1,5 @@
 import { EcsParts, createEcs, SystemClass } from "../src";
-import { createSystem } from "./factories";
+import { createSystem } from "friengine-test-utils";
 
 describe("SystemManager", () => {
     let ecs: EcsParts;

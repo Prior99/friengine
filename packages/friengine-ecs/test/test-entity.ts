@@ -5,7 +5,7 @@ import {
     Entity,
     Component,
 } from "../src";
-import { createComponent } from "./factories";
+import { createComponent } from "friengine-test-utils";
 
 describe("Entity", () => {
     let ecs: EcsParts;

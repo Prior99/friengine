@@ -1,4 +1,4 @@
-import { Component, ComponentClass } from "../../src";
+import { Component, ComponentClass } from "friengine-ecs";
 
 export function createComponent(name = "TestComponent"): ComponentClass {
     const obj = {

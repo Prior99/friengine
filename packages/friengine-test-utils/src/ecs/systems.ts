@@ -1,4 +1,4 @@
-import { System, SystemClass } from "../../src";
+import { System, SystemClass } from "friengine-ecs";
 
 export function createSystem(tickFn: (ms: number) => void = jest.fn()): SystemClass {
     return class SomeSystem extends System {

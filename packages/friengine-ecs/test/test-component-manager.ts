@@ -1,5 +1,5 @@
 import { ComponentClass, EcsParts, createEcs } from "../src";
-import { createComponent } from "./factories";
+import { createComponent } from "friengine-test-utils";
 
 describe("ComponentManager", () => {
     let ecs: EcsParts;
