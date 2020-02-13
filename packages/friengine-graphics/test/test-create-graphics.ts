@@ -7,7 +7,7 @@ jest.mock("../src/graphics", () => ({
     Graphics: class {},
 }));
 
-describe("createGraphics2d", () => {
+describe("createGraphics", () => {
     describe("with a functioning canvas", () => {
         let spyCreateCanvas: jest.SpyInstance<any>;
 
