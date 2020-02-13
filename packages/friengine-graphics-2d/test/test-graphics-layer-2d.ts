@@ -11,22 +11,22 @@ describe("Graphics", () => {
     let imageManager: ImageManager;
     let textureManager: TextureManager;
     let testLayer: TestLayer;
-    let textureHandle: ResourceHandle<Texture>;
+    let handle: ResourceHandle<Texture>;
 
     class TestLayer extends GraphicsLayer2d {
         public render(): void {
-            this.drawTexture({
-                textureHandle,
+            this.drawResource({
+                handle,
                 destPosition: vec2(10, 20),
                 srcPosition: vec2(10, 10),
                 srcDimensions: vec2(44, 44),
             });
-            this.drawTexture({
-                textureHandle,
+            this.drawResource({
+                handle,
                 destPosition: vec2(100, 50),
             });
-            this.drawTexture({
-                textureHandle,
+            this.drawResource({
+                handle,
                 destPosition: vec2(50, 40),
             });
         }
@@ -41,8 +41,8 @@ describe("Graphics", () => {
         testLayer = new TestLayer();
         graphics.addLayer(testLayer);
 
-        textureHandle = TextureManager.add(path.join(__dirname, "assets", "test.png"));
-        textureManager.load(textureHandle);
+        handle = TextureManager.add(path.join(__dirname, "assets", "test.png"));
+        textureManager.load(handle);
         await resourceManager.waitUntilFinished();
     });
 

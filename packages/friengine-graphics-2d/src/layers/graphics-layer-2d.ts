@@ -1,16 +1,9 @@
-import { Constructable, vec2, ResourceHandle, Vec2 } from "friengine-core";
+import { Constructable, vec2 } from "friengine-core";
 import { GraphicsLayer, GraphicsLayerOptions, TextureManager, Texture } from "friengine-graphics";
 import { Shader2d, DefaultShader2d } from "../shaders";
+import { ResourceDrawOptions2d, ResourceDrawer2d } from "../resource-drawer-2d";
 
-export interface DrawTextureOptions {
-    textureHandle: ResourceHandle<Texture>;
-    srcPosition?: Vec2;
-    destPosition: Vec2;
-    srcDimensions?: Vec2;
-    destDimensions?: Vec2;
-}
-
-export abstract class GraphicsLayer2d extends GraphicsLayer {
+export abstract class GraphicsLayer2d extends GraphicsLayer implements ResourceDrawer2d<Texture> {
     protected shader!: Shader2d;
     private vbo!: WebGLBuffer;
 
@@ -32,16 +25,16 @@ export abstract class GraphicsLayer2d extends GraphicsLayer {
         return super.initialized && Boolean(this.vbo) && Boolean(this.shader);
     }
 
-    public drawTexture({
-        textureHandle,
+    public drawResource({
+        handle,
         srcPosition,
         destPosition,
         srcDimensions,
         destDimensions,
-    }: DrawTextureOptions): void {
+    }: ResourceDrawOptions2d<Texture>): void {
         const { gl } = this;
         const { attributes } = this.shader;
-        const { texture, width, height } = this.textureManager.get(textureHandle);
+        const { texture, width, height } = this.textureManager.get(handle);
 
         gl.useProgram(this.shader.program);
 

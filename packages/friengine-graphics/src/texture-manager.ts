@@ -50,7 +50,6 @@ export class TextureManager extends SpecificResourceManager<TextureLoadOptions, 
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        // gl.generateMipmap(gl.TEXTURE_2D);
         gl.bindTexture(gl.TEXTURE_2D, null);
         return {
             texture,
@@ -60,7 +59,7 @@ export class TextureManager extends SpecificResourceManager<TextureLoadOptions, 
         };
     }
 
-    public load(handle: ResourceHandle<WebGLTexture>): Resource<Texture> {
+    public load(handle: ResourceHandle<Texture>): Resource<Texture> {
         const resource = super.load(handle);
         this.imageManager.loadAllKnownHandles(resource.dependencies);
         return resource;
