@@ -1,35 +1,7 @@
 import { logger } from "./utils";
-
-export enum LoadStatus {
-    PENDING = "pending",
-    IN_PROGRESS = "in progress",
-    DONE = "done",
-    ERROR = "error",
-}
-
-export interface BaseResource<T> {
-    load: () => Promise<T>;
-    status: LoadStatus;
-    type: symbol;
-    symbol: symbol;
-    dependencies: ResourceHandle<unknown>[];
-}
-
-export interface DoneResource<T> extends BaseResource<T> {
-    status: LoadStatus.DONE;
-    data: T;
-}
-
-export interface ErrorResource<T> extends BaseResource<T> {
-    status: LoadStatus.ERROR;
-    error: Error;
-}
-
-export interface UnfinishedResource<T> extends BaseResource<T> {
-    status: LoadStatus.PENDING | LoadStatus.IN_PROGRESS;
-}
-
-export type Resource<T> = DoneResource<T> | ErrorResource<T> | UnfinishedResource<T>;
+import { ResourceHandle } from "./resource-handle";
+import { LoadStatus, Resource, DoneResource, UnfinishedResource } from "./resource";
+import { LoadResultStatus, LoadResult } from "./load-result";
 
 export interface ResourceLoader<T> {
     type: symbol;
@@ -37,7 +9,7 @@ export interface ResourceLoader<T> {
     dependencies?: ResourceHandle<unknown>[];
 }
 
-export type LoaderFunction<TOptions, TResource> = (options: TOptions) => Promise<TResource>;
+export type LoaderFunction<TOptions, TResource> = (options: TOptions) => Promise<LoadResult<TResource>>;
 
 export interface ResourceListener<T> {
     resolve: (resource: DoneResource<T>) => void;
@@ -49,10 +21,6 @@ export interface ResourceSearchOptions {
     anyStatus?: LoadStatus[];
     type?: symbol;
     filter?: (resource: Resource<unknown>, index: number) => boolean;
-}
-
-export interface ResourceHandle<T> {
-    symbol: symbol;
 }
 
 export class ResourceManager {
@@ -241,18 +209,33 @@ export class ResourceManager {
 
     private async process(resource: Resource<unknown>): Promise<void> {
         try {
-            const data = await resource.load();
-            Object.assign(resource, {
-                status: LoadStatus.DONE,
-                data,
-            });
+            const result: LoadResult<unknown> = await resource.load();
+            switch (result.status) {
+                case LoadResultStatus.ERROR:
+                    throw result.error;
+                case LoadResultStatus.SUCCESS:
+                    Object.assign(resource, {
+                        status: LoadStatus.DONE,
+                        data: result.data,
+                    });
+                    this.invokeResourceListeners(resource);
+                    break;
+                case LoadResultStatus.DEFERRED:
+                    resource.dependencies.push(
+                        ...result.dependencies.filter(
+                            ({ symbol }) => !resource.dependencies.some(existing => existing.symbol === symbol),
+                        ),
+                    );
+                    resource.status = LoadStatus.PENDING;
+                    break;
+            }
         } catch (error) {
             Object.assign(resource, {
                 status: LoadStatus.ERROR,
                 error,
             });
-        } finally {
             this.invokeResourceListeners(resource);
+        } finally {
             this.fillQueue();
         }
     }

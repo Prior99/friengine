@@ -1,11 +1,11 @@
 import {
     ResourceManager,
-    DoneResource,
-    ResourceHandle,
-    Resource,
     ResourceLoader,
 } from "./resource-manager";
 import { Constructable } from "./types";
+import { ResourceHandle } from "./resource-handle";
+import { Resource, DoneResource } from "./resource";
+import { LoadResult } from "./load-result";
 
 export interface SpecificResourceManagerConfig<TData, TOptions> {
     superClass: Constructable<BaseSpecificResourceManager<TData, TOptions>, [ResourceManager]>;
@@ -34,7 +34,7 @@ export abstract class BaseSpecificResourceManager<TOptions, TData> implements Sp
         );
     }
 
-    protected abstract loader(options: TOptions): Promise<TData>;
+    protected abstract loader(options: TOptions): Promise<LoadResult<TData>>;
     protected readonly abstract resourceType: symbol;
 
     public get(resourceHandle: ResourceHandle<TData>): TData {

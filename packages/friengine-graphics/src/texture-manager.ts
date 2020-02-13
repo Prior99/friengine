@@ -1,4 +1,11 @@
-import { ResourceManager, ResourceHandle, BaseSpecificResourceManager, Resource } from "friengine-core";
+import {
+    ResourceManager,
+    ResourceHandle,
+    BaseSpecificResourceManager,
+    Resource,
+    LoadResult,
+    LoadResultStatus,
+} from "friengine-core";
 import { ImageManager } from "./image-manager";
 
 export interface TextureLoadOptions {
@@ -38,7 +45,7 @@ export class TextureManager extends BaseSpecificResourceManager<TextureLoadOptio
         super(resourceManager);
     }
 
-    protected async loader({ imageHandle }: TextureLoadOptions): Promise<Texture> {
+    protected async loader({ imageHandle }: TextureLoadOptions): Promise<LoadResult<Texture>> {
         const image = this.imageManager.get(imageHandle);
         const { width, height } = image;
         const { gl } = this;
@@ -52,10 +59,13 @@ export class TextureManager extends BaseSpecificResourceManager<TextureLoadOptio
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.bindTexture(gl.TEXTURE_2D, null);
         return {
-            texture,
-            width,
-            height,
-            imageHandle
+            status: LoadResultStatus.SUCCESS,
+            data: {
+                texture,
+                width,
+                height,
+                imageHandle,
+            },
         };
     }
 

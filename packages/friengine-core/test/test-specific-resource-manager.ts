@@ -4,6 +4,7 @@ import {
     Constructable,
     LoadStatus,
     BaseSpecificResourceManager,
+    LoadResultStatus,
 } from "../src";
 
 describe("SpecificResourceManager", () => {
@@ -26,8 +27,28 @@ describe("SpecificResourceManager", () => {
     beforeEach(() => {
         resourceType1 = Symbol("ResourceTypeTest1");
         resourceType2 = Symbol("ResourceTypeTest2");
-        loadFn1 = jest.fn(({ value }) => new Promise(resolve => setTimeout(() => resolve(value))));
-        loadFn2 = jest.fn(({ value }) => new Promise(resolve => setTimeout(() => resolve(value))));
+        loadFn1 = jest.fn(
+            ({ value }) =>
+                new Promise(resolve =>
+                    setTimeout(() =>
+                        resolve({
+                            status: LoadResultStatus.SUCCESS,
+                            data: value,
+                        }),
+                    ),
+                ),
+        );
+        loadFn2 = jest.fn(
+            ({ value }) =>
+                new Promise(resolve =>
+                    setTimeout(() =>
+                        resolve({
+                            status: LoadResultStatus.SUCCESS,
+                            data: value,
+                        }),
+                    ),
+                ),
+        );
 
         TestManager1 = class extends BaseSpecificResourceManager<string, TestOptions> {
             protected readonly resourceType = resourceType1;
@@ -54,11 +75,12 @@ describe("SpecificResourceManager", () => {
         });
 
         describe("loading a mixture of known and foreign resource handles", () => {
-            beforeEach(() => testManager1.loadAllKnownHandles([ handle1, handle2 ]));
+            beforeEach(() => testManager1.loadAllKnownHandles([handle1, handle2]));
 
             it("called the loader only once", () => expect(loadFn1).toHaveBeenCalledTimes(1));
 
-            it("called the loader for the correct handle", () => expect(loadFn1).toHaveBeenCalledWith({ value: "value 1"}));
+            it("called the loader for the correct handle", () =>
+                expect(loadFn1).toHaveBeenCalledWith({ value: "value 1" }));
         });
 
         describe("when loading resources individually", () => {

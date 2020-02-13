@@ -1,4 +1,10 @@
-import { ResourceManager, ResourceHandle, BaseSpecificResourceManager } from "friengine-core";
+import {
+    ResourceManager,
+    ResourceHandle,
+    BaseSpecificResourceManager,
+    LoadResultStatus,
+    LoadResult,
+} from "friengine-core";
 import { LoadImage, loadImage as defaultLoadImage } from "./utils";
 
 export interface ImageManagerOptions {
@@ -33,7 +39,10 @@ export class ImageManager extends BaseSpecificResourceManager<ImageLoadOptions, 
         return this.options.loadImage ?? defaultLoadImage;
     }
 
-    protected loader({ url }: ImageLoadOptions): Promise<HTMLImageElement> {
-        return this.loadImage(url);
+    protected async loader({ url }: ImageLoadOptions): Promise<LoadResult<HTMLImageElement>> {
+        return {
+            status: LoadResultStatus.SUCCESS,
+            data: await this.loadImage(url),
+        };
     }
 }

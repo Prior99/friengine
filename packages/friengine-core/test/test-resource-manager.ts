@@ -1,27 +1,69 @@
-import { ResourceManager, Resource, LoadStatus, DoneResource, ErrorResource, ResourceHandle } from "../src";
+import {
+    ResourceManager,
+    Resource,
+    LoadStatus,
+    DoneResource,
+    ErrorResource,
+    ResourceHandle,
+    LoadResult,
+    LoadResultStatus,
+} from "../src";
 
 describe("ResourceManager", () => {
     let resourceManager: ResourceManager;
     let type1: symbol;
     let type2: symbol;
 
-    const createLoader = (value: string, type: symbol, error = false) => { // eslint-disable-line
-        let resolve: (value: string) => void;
+    // eslint-disable-next-line
+    const createLoader = (
+        value: string,
+        type: symbol,
+        error = false,
+        rejects = true,
+        dependencies?: ResourceHandle<unknown>[],
+    ) => {
+        let hasDeferred = false;
+
+        let resolve: (value: LoadResult<string>) => void;
         let reject: (err: Error) => void;
+
+        const createPromise = (): any =>
+            new Promise((res: (value: LoadResult<string>) => void, rej) => {
+                resolve = res;
+                reject = rej;
+            });
+        let promise = createPromise();
+
         const finish = (): any => {
             if (error) {
-                reject(new Error("Something went wrong"));
+                if (rejects) {
+                    reject(new Error("Something went wrong"));
+                } else {
+                    resolve({
+                        status: LoadResultStatus.ERROR,
+                        error: new Error("Something went wrong"),
+                    });
+                }
+            } else if (dependencies && !hasDeferred) {
+                dependencies.forEach(dependency => resourceManager.load(dependency, (options: any) => options.load()));
+                resolve({ status: LoadResultStatus.DEFERRED, dependencies });
             } else {
-                resolve(value);
+                resolve({ status: LoadResultStatus.SUCCESS, data: value });
             }
         };
-        const promise = new Promise((res: (value: string) => void, rej) => {
-            resolve = res;
-            reject = rej;
-        });
+
         return {
             loader: {
-                options: { load: (): Promise<string> => promise },
+                options: {
+                    load: async (): Promise<LoadResult<string>> => {
+                        const result = await promise;
+                        if (result.status === LoadResultStatus.DEFERRED) {
+                            hasDeferred = true;
+                            promise = createPromise();
+                        }
+                        return result;
+                    },
+                },
                 type,
             },
             finish,
@@ -53,8 +95,30 @@ describe("ResourceManager", () => {
 
         it("loading a resource that hasn't been registered", () =>
             expect(() =>
-                resourceManager.load({ symbol: Symbol() }, async () => undefined),
+                resourceManager.load({ symbol: Symbol() }, async () => ({
+                    data: undefined,
+                    status: LoadResultStatus.SUCCESS,
+                })),
             ).toThrowErrorMatchingInlineSnapshot(`"Not a resource handle."`));
+    });
+
+    describe("with a resource that returns an error", () => {
+        let loader: ReturnType<typeof createLoader>;
+        let handle: ResourceHandle<string>;
+        let resource: Resource<string>;
+        let waitForResource2Rejected = false;
+
+        beforeEach(() => {
+            ResourceManager.reset();
+            loader = createLoader("value 2", type1, true, false);
+            handle = ResourceManager.add(loader.loader);
+
+            resource = resourceManager.load(handle, (options: any) => options.load());
+            resourceManager.waitFor(resource).catch(() => (waitForResource2Rejected = true));
+            loader.finish();
+        });
+
+        it("promise waiting for resource rejects", () => expect(waitForResource2Rejected).toBe(true));
     });
 
     describe("after adding 3 resources", () => {
@@ -243,6 +307,113 @@ describe("ResourceManager", () => {
             });
         });
 
+        describe("with deferred dependencies", () => {
+            let handle5: ResourceHandle<string>;
+            let handle6: ResourceHandle<string>;
+
+            beforeEach(() => {
+                loaders.push(createLoader("value 5", type1, false, true, [handle4]));
+                handle5 = ResourceManager.add(loaders[4].loader);
+                loaders.push(createLoader("value 6", type1, false, true, [handle5]));
+                handle6 = ResourceManager.add(loaders[5].loader);
+            });
+
+            it("doesn't know handle 1", () => expect(resourceManager.knowsHandle(handle1)).toBe(false));
+
+            it("doesn't know handle 2", () => expect(resourceManager.knowsHandle(handle2)).toBe(false));
+
+            it("doesn't know handle 3", () => expect(resourceManager.knowsHandle(handle3)).toBe(false));
+
+            it("doesn't know handle 4", () => expect(resourceManager.knowsHandle(handle4)).toBe(false));
+
+            it("doesn't know handle 5", () => expect(resourceManager.knowsHandle(handle5)).toBe(false));
+
+            it("doesn't know handle 6", () => expect(resourceManager.knowsHandle(handle6)).toBe(false));
+
+            describe("when loading resource 6", () => {
+                beforeEach(() => resourceManager.load(handle6, (options: any) => options.load()));
+
+                it("is in progress", () =>
+                    expect(resourceManager.getResource(handle6).status).toBe(LoadStatus.IN_PROGRESS));
+
+                it("knows handle 6", () => expect(resourceManager.knowsHandle(handle6)).toBe(true));
+
+                describe("after resource 6 finished loading", () => {
+                    beforeEach(() => loaders[5].finish());
+
+                    it("is pending", () =>
+                        expect(resourceManager.getResource(handle6).status).toBe(LoadStatus.PENDING));
+
+                    it("can't load resource 6", () =>
+                        expect(resourceManager.isResourceLoadable(resourceManager.getResource(handle6))).toBe(false));
+
+                    it("knows handle 5", () => expect(resourceManager.knowsHandle(handle5)).toBe(true));
+
+                    describe("after resource 5 finished loading", () => {
+                        beforeEach(() => loaders[4].finish());
+
+                        it("resource 5 is pending", () =>
+                            expect(resourceManager.getResource(handle5).status).toBe(LoadStatus.PENDING));
+
+                        it("can't load resource 5", () =>
+                            expect(resourceManager.isResourceLoadable(resourceManager.getResource(handle5))).toBe(
+                                false,
+                            ));
+
+                        it("resource 6 is pending", () =>
+                            expect(resourceManager.getResource(handle6).status).toBe(LoadStatus.PENDING));
+
+                        it("knows handle 4", () => expect(resourceManager.knowsHandle(handle4)).toBe(true));
+
+                        describe("after resources 1 - 4 finished loading", () => {
+                            beforeEach(async () => {
+                                resourceManager.load(handle1, (options: any) => options.load());
+                                resourceManager.load(handle2, (options: any) => options.load());
+                                resourceManager.load(handle3, (options: any) => options.load());
+                                resourceManager.load(handle4, (options: any) => options.load());
+                                loaders.slice(0, 4).forEach(loader => loader.finish());
+                                await Promise.all(
+                                    [handle1, handle2, handle3, handle4]
+                                        .map(handle => resourceManager.getResource(handle))
+                                        .map(resource => resourceManager.waitFor(resource)),
+                                );
+                            });
+
+                            it("has loaded resource 1", () => expect(resourceManager.get(handle1)).toBe("value 1"));
+
+                            it("has loaded resource 2", () => expect(resourceManager.get(handle2)).toBe("value 2"));
+
+                            it("has loaded resource 3", () => expect(resourceManager.get(handle3)).toBe("value 3"));
+
+                            it("has loaded resource 4", () => expect(resourceManager.get(handle4)).toBe("value 4"));
+
+                            it("resource 5 is in progress", () =>
+                                expect(resourceManager.getResource(handle5).status).toBe(LoadStatus.IN_PROGRESS));
+
+                            it("resource 6 is pending", () =>
+                                expect(resourceManager.getResource(handle6).status).toBe(LoadStatus.PENDING));
+
+                            describe("after resource 5 finished loading again", () => {
+                                beforeEach(() => loaders[4].finish());
+
+                                it("has loaded resource 5", () => expect(resourceManager.get(handle5)).toBe("value 5"));
+
+                                it("resource 6 is in progress", () =>
+                                    expect(resourceManager.getResource(handle6).status).toBe(LoadStatus.IN_PROGRESS));
+
+                                describe("after resource 6 finished loading again", () => {
+                                    beforeEach(() => loaders[5].finish());
+
+                                    it("has loaded resource 6", () =>
+                                        expect(resourceManager.get(handle6)).toBe("value 6"));
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
         describe("with a second resource manager", () => {
             let resource: Resource<string>;
 
@@ -256,12 +427,10 @@ describe("ResourceManager", () => {
 
         describe("when loading all resources at once", () => {
             beforeEach(() => {
-                [
-                    resourceManager.load(handle1, (options: any) => options.load()),
-                    resourceManager.load(handle2, (options: any) => options.load()),
-                    resourceManager.load(handle3, (options: any) => options.load()),
-                    resourceManager.load(handle4, (options: any) => options.load()),
-                ];
+                resourceManager.load(handle1, (options: any) => options.load());
+                resourceManager.load(handle2, (options: any) => options.load());
+                resourceManager.load(handle3, (options: any) => options.load());
+                resourceManager.load(handle4, (options: any) => options.load());
             });
 
             describe("after waiting for all resources to have loaded", () => {
