@@ -1,7 +1,6 @@
-import { defaultVertexShaderSource, defaultFragmentShaderSource, compileShader } from "./utils";
 import { TextureManager } from "./texture-manager";
-import { ResourceHandle, Vec2, vec2, logger } from "friengine-core";
-import { Shader } from "./shader";
+import { ResourceHandle, Vec2, vec2 } from "friengine-core";
+import { Shader, Default2dShader } from "./shaders";
 
 export interface DrawTextureOptions {
     textureHandle: ResourceHandle<WebGLTexture>;
@@ -12,26 +11,14 @@ export interface DrawTextureOptions {
 }
 
 export interface Graphics2dOptions {
-    vertexShaderSource?: string;
-    fragmentShaderSource?: string;
     width: number;
     height: number;
 }
 
-const uniforms = [
-    "colors",
-    "srcPosition",
-    "srcDimensions",
-    "destPosition",
-    "destDimensions",
-    "textureDimensions",
-    "screenDimensions",
-] as const;
-const attributes = ["vertexPosition"] as const;
 
 export class Graphics2d {
     private vbo: WebGLBuffer;
-    private shader!: Shader<typeof attributes, typeof uniforms>;
+    private shader!: Default2dShader;
 
     constructor(
         public gl: WebGL2RenderingContext,
@@ -45,24 +32,9 @@ export class Graphics2d {
         this.vbo = gl.createBuffer()!;
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, 1, 1, 1, -1, -1, 1, 1, 1, -1, -1, -1]), gl.STATIC_DRAW);
-        this.shader = new Shader(gl, {
-            uniforms,
-            attributes,
-            sources: {
-                fragmentShader: options.fragmentShaderSource ?? defaultFragmentShaderSource,
-                vertexShader: options.vertexShaderSource ?? defaultVertexShaderSource,
-            },
-        });
+        this.shader = new Default2dShader(gl);
         gl.useProgram(this.shader.program);
         this.shader.uniform2f("screenDimensions", vec2(options.width, options.height));
-    }
-
-    protected get vertexShaderSource(): string {
-        return this.options.vertexShaderSource ?? defaultVertexShaderSource;
-    }
-
-    protected get fragmentShaderSource(): string {
-        return this.options.fragmentShaderSource ?? defaultFragmentShaderSource;
     }
 
     public drawTexture({

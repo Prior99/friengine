@@ -15,13 +15,15 @@ export type ShaderInfo<TAttributes extends readonly string[], TUniforms extends 
     uniforms: ShaderUniforms<TUniforms>;
 };
 
+export interface ShaderSources {
+    fragmentShader: string;
+    vertexShader: string;
+}
+
 export interface ShaderOptions<TAttributes extends readonly string[], TUniforms extends readonly string[]> {
     attributes: TAttributes;
     uniforms: TUniforms;
-    sources: {
-        fragmentShader: string;
-        vertexShader: string;
-    };
+    sources: ShaderSources;
 }
 
 export class Shader<TAttributes extends readonly string[], TUniforms extends readonly string[]> {
