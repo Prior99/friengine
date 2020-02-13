@@ -6,3 +6,4 @@ export * from "./specific-resource-manager";
 export * from "./load-result";
 export * from "./resource";
 export * from "./resource-handle";
+export * from "./json-manager";
