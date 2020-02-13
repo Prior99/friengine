@@ -39,11 +39,11 @@ export abstract class BaseSpecificResourceManager<TOptions, TData, TMeta = {}> i
     protected abstract loader(options: TOptions, handle: ResourceHandle<TData>): Promise<LoadResult<TData>>;
     protected readonly abstract resourceType: symbol;
 
-    public get(resourceHandle: ResourceHandle<TData>): TData {
+    public get<T extends TData>(resourceHandle: ResourceHandle<T>): T {
         return this.resourceManager.get(resourceHandle);
     }
 
-    public getResource(resourceHandle: ResourceHandle<TData>): Resource<TData> {
+    public getResource<T extends TData>(resourceHandle: ResourceHandle<T>): Resource<T> {
         return this.resourceManager.getResource(resourceHandle);
     }
 

@@ -1,4 +1,4 @@
-import { Constructable, vec2 } from "friengine-core";
+import { Constructable, vec2, Rect } from "friengine-core";
 import { GraphicsLayer, GraphicsLayerOptions, TextureManager, Texture } from "friengine-graphics";
 import { Shader2d, DefaultShader2d } from "../shaders";
 import { ResourceDrawOptions2d, ResourceDrawer2d } from "../resource-drawer-2d";
@@ -25,20 +25,21 @@ export abstract class GraphicsLayer2d extends GraphicsLayer implements ResourceD
         return super.initialized && Boolean(this.vbo) && Boolean(this.shader);
     }
 
-    public drawResource({
-        handle,
-        srcPosition,
-        destPosition,
-        srcDimensions,
-        destDimensions,
-    }: ResourceDrawOptions2d<Texture>): void {
+    public drawResource({ handle, src, dest }: ResourceDrawOptions2d<Texture>): void {
         const { gl } = this;
         const { texture, width, height } = this.textureManager.get(handle);
 
         const textureDimensions = vec2(width, height);
-        this.shader.uniform2f("destDimensions", destDimensions ?? textureDimensions);
-        this.shader.uniform2f("srcDimensions", srcDimensions ?? textureDimensions);
-        this.shader.uniform2f("srcPosition", srcPosition ?? vec2(0, 0));
+
+        const srcPosition = Rect.isRect(src) ? src.topLeft : (src ?? vec2(0, 0));
+        const srcDimensions = Rect.isRect(src) ? src.dimensions : textureDimensions;
+
+        const destPosition = Rect.isRect(dest) ? dest.topLeft : dest;
+        const destDimensions = Rect.isRect(dest) ? dest.dimensions : textureDimensions;
+
+        this.shader.uniform2f("destDimensions", destDimensions);
+        this.shader.uniform2f("srcDimensions", srcDimensions);
+        this.shader.uniform2f("srcPosition", srcPosition);
         this.shader.uniform2f("destPosition", destPosition);
         this.shader.uniform2f("textureDimensions", textureDimensions);
 

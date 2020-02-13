@@ -1,4 +1,4 @@
-import { ResourceManager, ResourceHandle, vec2 } from "friengine-core";
+import { ResourceManager, ResourceHandle, vec2, rect } from "friengine-core";
 import { GraphicsLayer2d } from "../src";
 import { Graphics, TextureManager, Texture } from "friengine-graphics";
 import { toPng, createTestGraphics } from "friengine-test-utils";
@@ -16,17 +16,16 @@ describe("GraphicsLayer2d", () => {
         public render(): void {
             this.drawResource({
                 handle,
-                destPosition: vec2(10, 20),
-                srcPosition: vec2(10, 10),
-                srcDimensions: vec2(44, 44),
+                dest: vec2(10, 20),
+                src: rect(10, 10, 44, 44)
             });
             this.drawResource({
                 handle,
-                destPosition: vec2(100, 50),
+                dest: vec2(100, 50),
             });
             this.drawResource({
                 handle,
-                destPosition: vec2(50, 40),
+                dest: vec2(50, 40),
             });
         }
     }

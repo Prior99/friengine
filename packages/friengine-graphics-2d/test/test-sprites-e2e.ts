@@ -1,4 +1,4 @@
-import { ResourceHandle, vec2 } from "friengine-core";
+import { ResourceHandle, vec2, rect } from "friengine-core";
 import { GraphicsLayer2d, SpriteSimple, SpriteManager } from "../src";
 import { Graphics, Texture } from "friengine-graphics";
 import { toPng, createTestGraphics } from "friengine-test-utils";
@@ -7,7 +7,7 @@ import * as path from "path";
 describe("GraphicsLayer2d", () => {
     let graphics: Graphics;
     let testLayer: TestLayer;
-    let handle: ResourceHandle<Texture>;
+    let handle: ResourceHandle<SpriteSimple<Texture>>;
     let gl: WebGL2RenderingContext;
     let sprite: SpriteSimple<Texture>;
     let spriteManager: SpriteManager<Texture>;
@@ -18,9 +18,8 @@ describe("GraphicsLayer2d", () => {
                 const x = 80 * Math.cos(a);
                 const y = 80 * Math.sin(a);
                 sprite.draw(this, {
-                    destPosition: vec2(x, y).add(vec2(128, 88)),
-                    srcPosition: vec2(10, 10),
-                    srcDimensions: vec2(44, 44),
+                    dest: vec2(x, y).add(vec2(128, 88)),
+                    src: rect(10, 10, 44, 44),
                 });
             }
         }
@@ -34,7 +33,7 @@ describe("GraphicsLayer2d", () => {
         testLayer = new TestLayer();
         graphics.addLayer(testLayer);
 
-        handle = SpriteManager.addSimple(path.join(__dirname, "assets", "test.png"));
+        handle = SpriteManager.addSimple<Texture>(path.join(__dirname, "assets", "test.png"));
         spriteManager.load(handle);
         await spriteManager.waitUntilFinished();
         sprite = spriteManager.get(handle);
