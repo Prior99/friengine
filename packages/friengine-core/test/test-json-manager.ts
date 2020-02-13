@@ -54,7 +54,6 @@ describe("JsonManager", () => {
 
     describe("with default fetch", () => {
         let spyFetch: jest.SpyInstance<any>;
-        let handle: ResourceHandle<unknown>;
         const url = "http://example.com/test.json";
 
         beforeEach(async () => {
@@ -62,7 +61,7 @@ describe("JsonManager", () => {
             spyFetch = jest.fn(async () => ({ json: async () => ({}) } as any));
             window.fetch = spyFetch as any;
             jsonManager = new JsonManager(resourceManager);
-            handle = JsonManager.add(url);
+            JsonManager.add(url);
             jsonManager.loadAll();
         });
 
