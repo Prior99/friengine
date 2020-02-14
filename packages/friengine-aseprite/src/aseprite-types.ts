@@ -4,7 +4,7 @@ export interface AsepriteOffset {
 }
 
 export function isAsepriteOffset(offset: any): offset is AsepriteOffset {
-    if (typeof offset !== "object") {
+    if (typeof offset !== "object" || offset === null) {
         return false;
     }
     if (typeof offset.x !== "number") {
@@ -22,7 +22,7 @@ export interface AsepriteDimensions {
 }
 
 export function isAsepriteDimensions(dimensions: any): dimensions is AsepriteDimensions {
-    if (typeof dimensions !== "object") {
+    if (typeof dimensions !== "object" || dimensions === null) {
         return false;
     }
     if (typeof dimensions.w !== "number") {
@@ -36,7 +36,7 @@ export function isAsepriteDimensions(dimensions: any): dimensions is AsepriteDim
 
 export interface AsepriteRect extends AsepriteOffset, AsepriteDimensions {}
 
-export function isAspriteRect(rect: any): rect is AsepriteRect {
+export function isAsepriteRect(rect: any): rect is AsepriteRect {
     return isAsepriteDimensions(rect) && isAsepriteOffset(rect);
 }
 
@@ -51,13 +51,13 @@ export interface AsepriteFrame {
 }
 
 export function isAsepriteFrame(frame: any): frame is AsepriteFrame {
-    if (typeof frame !== "object") {
+    if (typeof frame !== "object" || frame === null) {
         return false;
     }
     if (typeof frame.filename !== "string") {
         return false;
     }
-    if (!isAspriteRect(frame.frame)) {
+    if (!isAsepriteRect(frame.frame)) {
         return false;
     }
     if (typeof frame.rotated !== "boolean") {
@@ -66,7 +66,7 @@ export function isAsepriteFrame(frame: any): frame is AsepriteFrame {
     if (typeof frame.trimmed !== "boolean") {
         return false;
     }
-    if (!isAspriteRect(frame.spriteSourceSize)) {
+    if (!isAsepriteRect(frame.spriteSourceSize)) {
         return false;
     }
     if (!isAsepriteDimensions(frame.sourceSize)) {
@@ -95,7 +95,7 @@ export interface AsepriteFrameTag {
 }
 
 export function isAsepriteFrameTag(frameTag: any): frameTag is AsepriteFrameTag {
-    if (typeof frameTag !== "object") {
+    if (typeof frameTag !== "object" || frameTag === null) {
         return false;
     }
     if (typeof frameTag.name !== "string") {
@@ -127,7 +127,7 @@ export interface AsepriteAtlas {
 }
 
 export function isAsepriteAtlas(atlas: any): atlas is AsepriteAtlas {
-    if (typeof atlas !== "object") {
+    if (typeof atlas !== "object" || atlas === null) {
         return false;
     }
     if (!Array.isArray(atlas.frames)) {
@@ -136,7 +136,7 @@ export function isAsepriteAtlas(atlas: any): atlas is AsepriteAtlas {
     if (atlas.frames.some((frame: any) => !isAsepriteFrame(frame))) {
         return false;
     }
-    if (typeof atlas.meta !== "object") {
+    if (typeof atlas.meta !== "object" || atlas.meta === null) {
         return false;
     }
     if (typeof atlas.meta.app !== "string") {
@@ -160,7 +160,7 @@ export function isAsepriteAtlas(atlas: any): atlas is AsepriteAtlas {
     if (typeof atlas.meta.frameTags !== "undefined" && !Array.isArray(atlas.meta.frameTags)) {
         return false;
     }
-    if (atlas.meta.some((frameTag: any) => !isAsepriteFrameTag(frameTag))) {
+    if (atlas.meta.frameTags && atlas.meta.frameTags.some((frameTag: any) => !isAsepriteFrameTag(frameTag))) {
         return false;
     }
     return true;

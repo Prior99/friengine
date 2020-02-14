@@ -1,4 +1,4 @@
-import { Rect, Vec2 } from "friengine-core";
+import { Rect } from "friengine-core";
 
 export interface Frame {
     duration: number;
