@@ -73,36 +73,53 @@ describe("SpriteManager", () => {
         let spyCreateJsonHandle: jest.SpyInstance<any>;
         let spyLoadJson: jest.SpyInstance<any>;
 
-        beforeEach(() => {
-            jsonHandle = JsonManager.add("http://example.com/something.json");
-            spyLoadJson = jest.spyOn(jsonManager, "load");
-            spyCreateJsonHandle = jest.spyOn(JsonManager, "add").mockImplementation(() => jsonHandle);
-            atlas = new Atlas("image.png", [
-                { rect: rect(0, 0, 8, 8), duration: 100 },
-                { rect: rect(8, 0, 8, 8), duration: 200 },
-                { rect: rect(16, 0, 8, 8), duration: 300 },
-                { rect: rect(24, 0, 8, 8), duration: 400 },
-            ]);
-            spyAtlasParser = jest.fn(() => ({ status: AtlasParserStatus.SUCCESS, atlas }));
-            handle = SpriteManager.addAnimated(someUrl, spyAtlasParser);
-            spriteManager.load(handle);
+        describe("with atlas parser success", () => {
+            beforeEach(() => {
+                jsonHandle = JsonManager.add("http://example.com/something.json");
+                spyLoadJson = jest.spyOn(jsonManager, "load");
+                spyCreateJsonHandle = jest.spyOn(JsonManager, "add").mockImplementation(() => jsonHandle);
+                atlas = new Atlas("image.png", [
+                    { rect: rect(0, 0, 8, 8), duration: 100 },
+                    { rect: rect(8, 0, 8, 8), duration: 200 },
+                    { rect: rect(16, 0, 8, 8), duration: 300 },
+                    { rect: rect(24, 0, 8, 8), duration: 400 },
+                ]);
+                spyAtlasParser = jest.fn(() => ({ status: AtlasParserStatus.SUCCESS, atlas }));
+                handle = SpriteManager.addAnimated(someUrl, spyAtlasParser);
+                spriteManager.load(handle);
+            });
+
+            it("knows the handle", () => expect(spriteManager.isKnownHandle(handle)).toBe(true));
+
+            it("creates a json handle", () => expect(spyCreateJsonHandle).toHaveBeenCalledWith(someUrl));
+
+            describe("after waiting for the sprite to finish loading", () => {
+                beforeEach(() => spriteManager.waitUntilFinished());
+
+                it("calls load on the json manager", () => expect(spyLoadJson).toHaveBeenCalledWith(jsonHandle));
+
+                it("calls the atlas parser", () => expect(spyAtlasParser).toHaveBeenCalledWith({ some: "value" }));
+
+                it("calls load on the json manager", () => expect(spyLoadJson).toHaveBeenCalledWith(jsonHandle));
+
+                it("has the sprite available", () =>
+                    expect(spriteManager.get(handle)).toEqual(new SpriteAnimated(drawableHandle, atlas)));
+            });
         });
 
-        it("knows the handle", () => expect(spriteManager.isKnownHandle(handle)).toBe(true));
+        describe("with the atlas parser failing", () => {
+            beforeEach(() => {
+                jsonHandle = JsonManager.add("http://example.com/something.json");
+                spyLoadJson = jest.spyOn(jsonManager, "load");
+                spyAtlasParser = jest.fn(() => ({ status: AtlasParserStatus.ERROR }));
+                handle = SpriteManager.addAnimated(someUrl, spyAtlasParser);
+                spriteManager.load(handle);
+            });
 
-        it("creates a json handle", () => expect(spyCreateJsonHandle).toHaveBeenCalledWith(someUrl));
-
-        describe("after waiting for the sprite to finish loading", () => {
-            beforeEach(() => spriteManager.waitUntilFinished());
-
-            it("calls load on the json manager", () => expect(spyLoadJson).toHaveBeenCalledWith(jsonHandle));
-
-            it("calls the atlas parser", () => expect(spyAtlasParser).toHaveBeenCalledWith({ some: "value" }));
-
-            it("calls load on the json manager", () => expect(spyLoadJson).toHaveBeenCalledWith(jsonHandle));
-
-            it("has the sprite available", () =>
-                expect(spriteManager.get(handle)).toEqual(new SpriteAnimated(drawableHandle, atlas)));
+            it("rejects on load", () =>
+                expect(spriteManager.waitUntilFinished()).rejects.toMatchInlineSnapshot(
+                    `[Error: Unable to parse atlas.]`,
+                ));
         });
     });
 });
