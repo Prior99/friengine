@@ -47,6 +47,8 @@ describe("SpriteManager", () => {
             spriteManager.load(handle);
         });
 
+        it("created the handle", () => expect(SpriteManager.allHandles).toHaveLength(1));
+
         it("knows the handle", () => expect(spriteManager.isKnownHandle(handle)).toBe(true));
 
         it("creates a drawable handle", () => expect(spyCreateDrawableHandle).toHaveBeenCalledWith(someUrl));
