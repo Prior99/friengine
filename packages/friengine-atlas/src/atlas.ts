@@ -8,7 +8,7 @@ export class Atlas {
         if (animations) {
             animations.forEach(animation => this.animations.set(animation.name, animation));
         } else {
-            this.animations.set("default", new Animation("default", 0, frames.length, AnimationDirection.FORWARD));
+            this.animations.set("default", new Animation("default", 0, frames.length - 1, AnimationDirection.FORWARD));
         }
     }
 
@@ -32,7 +32,7 @@ export class Atlas {
         return duration;
     }
 
-    public getFrame(animationName: string, time: number): Frame | undefined {
+    public frame(animationName: string, time: number): Frame | undefined {
         const animation = this.animations.get(animationName);
         if (!animation) {
             return;
@@ -42,12 +42,13 @@ export class Atlas {
         do {
             frame = frameGenerator.next().value;
             time -= frame.duration;
-        } while (time > 0);
+        } while (time >= 0);
         return frame;
     }
 
-    public *frameGenerator(animationName: string): Generator<Frame> | undefined {
+    private *frameGenerator(animationName: string): Generator<Frame> | undefined {
         const animation = this.animations.get(animationName);
+        /* istanbul ignore if */
         if (!animation) {
             return;
         }
