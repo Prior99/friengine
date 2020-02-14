@@ -39,33 +39,27 @@ describe("aseprite types", () => {
         it.each([
             ...commonBadTypes,
             {
-                filename: "some-name.jpg",
                 frame: { x: 1, y: 1 },
             },
             {
-                filename: "some-name.jpg",
                 frame: { x: 1, y: 1, w: 10, h: 10 },
             },
             {
-                filename: "some-name.jpg",
                 frame: { x: 1, y: 1, w: 10, h: 10 },
                 rotated: false,
             },
             {
-                filename: "some-name.jpg",
                 frame: { x: 1, y: 1, w: 10, h: 10 },
                 rotated: false,
                 trimmed: false,
             },
             {
-                filename: "some-name.jpg",
                 frame: { x: 1, y: 1, w: 10, h: 10 },
                 rotated: false,
                 trimmed: false,
                 spriteSourceSize: { w: 10, h: 10 },
             },
             {
-                filename: "some-name.jpg",
                 frame: { x: 1, y: 1, w: 10, h: 10 },
                 rotated: false,
                 trimmed: false,
@@ -73,7 +67,6 @@ describe("aseprite types", () => {
                 sourceSize: { w: 1 },
             },
             {
-                filename: "some-name.jpg",
                 frame: { x: 1, y: 1, w: 10, h: 10 },
                 rotated: false,
                 trimmed: false,
@@ -84,7 +77,6 @@ describe("aseprite types", () => {
 
         it.each([
             {
-                filename: "some-name.jpg",
                 frame: { x: 1, y: 1, w: 10, h: 10 },
                 rotated: false,
                 trimmed: false,
@@ -144,30 +136,30 @@ describe("aseprite types", () => {
         it.each([
             ...commonBadTypes,
             {
-                frames: [],
+                frames: {},
             },
             {
                 frames: [null],
             },
             {
-                frames: [],
+                frames: {},
                 meta: {},
             },
             {
-                frames: [],
+                frames: {},
                 meta: {
                     app: "test app",
                 },
             },
             {
-                frames: [],
+                frames: {},
                 meta: {
                     app: "test app",
                     version: "1.0.0",
                 },
             },
             {
-                frames: [],
+                frames: {},
                 meta: {
                     app: "test app",
                     version: "1.0.0",
@@ -175,7 +167,7 @@ describe("aseprite types", () => {
                 },
             },
             {
-                frames: [],
+                frames: {},
                 meta: {
                     app: "test app",
                     version: "1.0.0",
@@ -184,7 +176,7 @@ describe("aseprite types", () => {
                 },
             },
             {
-                frames: [],
+                frames: {},
                 meta: {
                     app: "test app",
                     version: "1.0.0",
@@ -194,7 +186,7 @@ describe("aseprite types", () => {
                 },
             },
             {
-                frames: [],
+                frames: {},
                 meta: {
                     app: "test app",
                     version: "1.0.0",
@@ -206,7 +198,7 @@ describe("aseprite types", () => {
                 },
             },
             {
-                frames: [],
+                frames: {},
                 meta: {
                     app: "test app",
                     version: "1.0.0",
@@ -221,7 +213,7 @@ describe("aseprite types", () => {
 
         it.each([
             {
-                frames: [],
+                frames: {},
                 meta: {
                     app: "test app",
                     version: "1.0.0",

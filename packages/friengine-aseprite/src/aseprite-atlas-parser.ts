@@ -11,11 +11,10 @@ export function parseAsepriteAnimationDirection(direction: AsepriteFrameTagDirec
 }
 
 export function parseAsepriteAtlas(input: unknown): AtlasParserResult {
-    console.log(input)
     if (!isAsepriteAtlas(input)) {
         return { status: AtlasParserStatus.ERROR };
     }
-    const frames = input.frames.map(({ frame, duration }) => ({
+    const frames = Object.values(input.frames).map(({ frame, duration }) => ({
         duration,
         rect: rect(frame.x, frame.y, frame.w, frame.h),
     }));

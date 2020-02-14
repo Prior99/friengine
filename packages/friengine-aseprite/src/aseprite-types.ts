@@ -54,9 +54,6 @@ export function isAsepriteFrame(frame: any): frame is AsepriteFrame {
     if (typeof frame !== "object" || frame === null) {
         return false;
     }
-    if (typeof frame.filename !== "string") {
-        return false;
-    }
     if (!isAsepriteRect(frame.frame)) {
         return false;
     }
@@ -130,10 +127,10 @@ export function isAsepriteAtlas(atlas: any): atlas is AsepriteAtlas {
     if (typeof atlas !== "object" || atlas === null) {
         return false;
     }
-    if (!Array.isArray(atlas.frames)) {
+    if (typeof atlas.frames !== "object" || atlas.frames === null) {
         return false;
     }
-    if (atlas.frames.some((frame: any) => !isAsepriteFrame(frame))) {
+    if (Object.values(atlas.frames).some((frame: any) => !isAsepriteFrame(frame))) {
         return false;
     }
     if (typeof atlas.meta !== "object" || atlas.meta === null) {

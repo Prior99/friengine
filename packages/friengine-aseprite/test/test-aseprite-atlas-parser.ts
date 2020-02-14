@@ -8,9 +8,8 @@ describe("parseAsepriteAtlas", () => {
     it("parses example", () =>
         expect(
             parseAsepriteAtlas({
-                frames: [
-                    {
-                        filename: "file-0.ase",
+                frames: {
+                    "file-0.ase": {
                         frame: { x: 0, y: 0, w: 16, h: 24 },
                         rotated: false,
                         trimmed: false,
@@ -18,8 +17,7 @@ describe("parseAsepriteAtlas", () => {
                         sourceSize: { w: 16, h: 24 },
                         duration: 100,
                     },
-                    {
-                        filename: "file-1.ase",
+                    "file-1.ase": {
                         frame: { x: 16, y: 0, w: 16, h: 24 },
                         rotated: false,
                         trimmed: false,
@@ -27,8 +25,7 @@ describe("parseAsepriteAtlas", () => {
                         sourceSize: { w: 16, h: 24 },
                         duration: 200,
                     },
-                    {
-                        filename: "file-2.ase",
+                    "file-2.ase": {
                         frame: { x: 32, y: 0, w: 16, h: 24 },
                         rotated: false,
                         trimmed: false,
@@ -36,7 +33,7 @@ describe("parseAsepriteAtlas", () => {
                         sourceSize: { w: 16, h: 24 },
                         duration: 100,
                     },
-                ],
+                },
                 meta: {
                     app: "http://www.aseprite.org/",
                     version: "1.3-dev",
