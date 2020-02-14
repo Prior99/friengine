@@ -1,8 +1,8 @@
 import { Vec2, vec2 } from "./vec2";
 
 export class Rect {
+    // eslint-disable-next-line
     public static isRect(obj: any): obj is Rect {
-        // eslint-disable-line
         return obj instanceof Rect;
     }
     public topLeft: Vec2;

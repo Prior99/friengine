@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface AsepriteOffset {
     x: number;
     y: number;
@@ -162,3 +163,5 @@ export function isAsepriteAtlas(atlas: any): atlas is AsepriteAtlas {
     }
     return true;
 }
+
+/* eslint-enable @typescript-eslint/no-explicit-any */

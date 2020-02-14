@@ -2,7 +2,6 @@ import { Sprite, SpriteDrawOptions } from "./sprite";
 import { ResourceDrawer2d } from "../resource-drawer-2d";
 import { ResourceHandle, Vec2, rect, Rect } from "friengine-core";
 import { Atlas, Frame } from "friengine-atlas";
-import { rejects } from "assert";
 
 export interface SpriteAnimatedDrawOptions extends SpriteDrawOptions {
     time: number;
