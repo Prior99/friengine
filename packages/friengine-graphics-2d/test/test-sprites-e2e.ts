@@ -68,18 +68,18 @@ describe("GraphicsLayer2d", () => {
                     sprite.draw(this, {
                         animationName: "3to0",
                         time,
-                        dest: vec2(40, 0),
+                        dest: vec2(x, 40),
                     });
                     sprite.draw(this, {
                         animationName: "0to3to0",
                         time,
-                        dest: vec2(80, 0),
+                        dest: vec2(x, 80),
                         src: vec2(4, 4),
                     });
                     sprite.draw(this, {
                         animationName: "3to0",
                         time,
-                        dest: vec2(120, 0),
+                        dest: vec2(x, 120),
                         src: rect(4, 4, 28, 28),
                     });
                 }

@@ -53,6 +53,10 @@ export class Rect {
         const dimensions = bottomRight.sub(topLeft);
         return new Rect(topLeft, dimensions);
     }
+
+    public resize(newSize: Vec2): Rect {
+        return new Rect(this.topLeft, newSize);
+    }
 }
 
 export function rect(topLeft: Vec2, dimensions: Vec2): Rect;
