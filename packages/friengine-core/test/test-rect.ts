@@ -115,7 +115,7 @@ describe("Rect", () => {
         it("outside corner", () => expect(testRect.intersect(rect(100, 100, 5, 5))).toEqual(rect(50, 50, 0, 0)));
     });
 
-    it("resizing", () => expect(rect(10, 8, 11, 12).resize(5, 7)).toEqual(rect(10, 8, 5, 7)));
+    it("resizing", () => expect(rect(10, 8, 11, 12).resize(vec2(5, 7))).toEqual(rect(10, 8, 5, 7)));
 
     it.each([{ topLeft: vec2(0, 0), dimensions: vec2(10, 10) }])("#j is not a rect", v =>
         expect(Rect.isRect(v)).toBe(false),
