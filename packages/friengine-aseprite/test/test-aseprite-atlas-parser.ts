@@ -1,4 +1,4 @@
-import { AtlasParserStatus, Atlas, AnimationDirection } from "friengine-atlas";
+import { AtlasParserStatus, Atlas, AnimationDirection, Animation } from "friengine-atlas";
 import { rect } from "friengine-core";
 import { parseAsepriteAtlas } from "../src";
 
@@ -69,9 +69,9 @@ describe("parseAsepriteAtlas", () => {
                     },
                 ],
                 [
-                    { name: "Animation 1", from: 0, to: 1, direction: AnimationDirection.FORWARD },
-                    { name: "Animation 2", from: 1, to: 2, direction: AnimationDirection.REVERSE },
-                    { name: "Animation 3", from: 0, to: 2, direction: AnimationDirection.PING_PONG },
+                    new Animation("Animation 1", 0, 1, AnimationDirection.FORWARD),
+                    new Animation("Animation 2", 1, 2, AnimationDirection.REVERSE),
+                    new Animation("Animation 3", 0, 2, AnimationDirection.PING_PONG),
                 ],
             ),
         }));

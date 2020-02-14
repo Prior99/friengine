@@ -1,4 +1,4 @@
-import { AtlasParserResult, AtlasParserStatus, AnimationDirection, Atlas } from "friengine-atlas";
+import { AtlasParserResult, AtlasParserStatus, AnimationDirection, Animation, Atlas } from "friengine-atlas";
 import { isAsepriteAtlas, AsepriteFrameTagDirection } from "./aseprite-types";
 import { rect } from "friengine-core";
 
@@ -18,12 +18,12 @@ export function parseAsepriteAtlas(input: unknown): AtlasParserResult {
         duration,
         rect: rect(frame.x, frame.y, frame.w, frame.h),
     }));
-    const animations = input.meta.frameTags?.map(({ name, from, to, direction }) => ({
+    const animations = input.meta.frameTags?.map(({ name, from, to, direction }) => new Animation(
         name,
         from,
         to,
-        direction: parseAsepriteAnimationDirection(direction),
-    }));
+        parseAsepriteAnimationDirection(direction),
+    ));
     return {
         status: AtlasParserStatus.SUCCESS,
         atlas: new Atlas(frames, animations),
