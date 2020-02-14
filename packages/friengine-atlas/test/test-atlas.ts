@@ -29,7 +29,7 @@ describe("Atlas", () => {
 
     describe("without animations", () => {
         beforeEach(() => {
-            atlas = new Atlas(frames);
+            atlas = new Atlas("test.png", frames);
         });
 
         it("has a default animation", () => expect(atlas.hasAnimation("default")).toBe(true));
@@ -45,7 +45,7 @@ describe("Atlas", () => {
                 new Animation("Animation 3", 0, 3, AnimationDirection.REVERSE),
                 new Animation("Animation 4", 0, 3, AnimationDirection.PING_PONG),
             ];
-            atlas = new Atlas(frames, animations);
+            atlas = new Atlas("test.png", frames, animations);
         });
 
         describe.each([

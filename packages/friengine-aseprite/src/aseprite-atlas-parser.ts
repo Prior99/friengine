@@ -26,6 +26,6 @@ export function parseAsepriteAtlas(input: unknown): AtlasParserResult {
     ));
     return {
         status: AtlasParserStatus.SUCCESS,
-        atlas: new Atlas(frames, animations),
+        atlas: new Atlas(input.meta.image, frames, animations),
     };
 }

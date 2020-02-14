@@ -54,6 +54,7 @@ describe("parseAsepriteAtlas", () => {
         ).toEqual({
             status: AtlasParserStatus.SUCCESS,
             atlas: new Atlas(
+                "example.png",
                 [
                     {
                         rect: rect(0, 0, 16, 24),

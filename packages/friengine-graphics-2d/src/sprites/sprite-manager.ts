@@ -5,23 +5,38 @@ import {
     SpecificResourceManager,
     LoadResult,
     LoadResultStatus,
+    JsonManager,
 } from "friengine-core";
 import { Sprite } from "./sprite";
 import { SpriteSimple } from "./sprite-simple";
+import { AtlasParser, Atlas, AtlasParserStatus } from "friengine-atlas";
+import { SpriteAnimated } from "./sprite-animated";
+import { resolve } from "url";
 
 export const RESOURCE_TYPE_SPRITE = Symbol("ResourceTypeSprite");
 
 export enum SpriteType {
     SIMPLE = "simple",
+    ANIMATED = "animated",
 }
 
-export interface SpriteLoadOptions {
+export interface SpriteSimpleLoadOptions {
     url: string;
-    type: SpriteType;
+    type: SpriteType.SIMPLE;
 }
+
+export interface SpriteAnimatedLoadOptions {
+    url: string;
+    type: SpriteType.ANIMATED;
+    atlasParser: AtlasParser;
+}
+
+export type SpriteLoadOptions = SpriteSimpleLoadOptions | SpriteAnimatedLoadOptions;
 
 interface SpriteMeta<TResource> {
     drawableHandle?: ResourceHandle<TResource>;
+    atlasJsonHandle?: ResourceHandle<unknown>;
+    atlas?: Atlas;
 }
 
 export class SpriteManager<TResource> extends BaseSpecificResourceManager<
@@ -36,6 +51,13 @@ export class SpriteManager<TResource> extends BaseSpecificResourceManager<
         });
     }
 
+    static addAnimated<TResource>(url: string, atlasParser: AtlasParser): ResourceHandle<SpriteSimple<TResource>> {
+        return ResourceManager.add({
+            type: RESOURCE_TYPE_SPRITE,
+            options: { url, type: SpriteType.ANIMATED, atlasParser },
+        });
+    }
+
     static get allHandles(): ResourceHandle<HTMLImageElement>[] {
         return ResourceManager.getHandlesForType(RESOURCE_TYPE_SPRITE);
     }
@@ -44,10 +66,50 @@ export class SpriteManager<TResource> extends BaseSpecificResourceManager<
 
     constructor(
         resourceManager: ResourceManager,
+        private jsonManager: JsonManager,
         private drawableManager: SpecificResourceManager<TResource>,
         private createDrawableHandle: (url: string) => ResourceHandle<TResource>,
     ) {
         super(resourceManager);
+    }
+
+    private loaderSpriteAnimated(url: string, atlasParser: AtlasParser, handle: ResourceHandle<Sprite<TResource>>): LoadResult<Sprite<TResource>> {
+        const meta = this.meta.get(handle.symbol);
+        // Never called before. Load atlas.
+        if (!meta) {
+            const atlasJsonHandle = JsonManager.add(url);
+            this.jsonManager.load(atlasJsonHandle);
+            this.meta.set(handle.symbol, { atlasJsonHandle });
+            return {
+                status: LoadResultStatus.DEFERRED,
+                dependencies: [atlasJsonHandle],
+            };
+        }
+        const { atlasJsonHandle } = meta;
+        // Atlas loaded, but drawable handle not.
+        if (atlasJsonHandle && this.resourceManager.resourceDone(atlasJsonHandle) && !meta.drawableHandle) {
+            const atlasParseResult = atlasParser(this.jsonManager.get(atlasJsonHandle));
+            if (atlasParseResult.status === AtlasParserStatus.ERROR) {
+                return {
+                    status: LoadResultStatus.ERROR,
+                    error: new Error("Unable to parse atlas."),
+                };
+            }
+            const { atlas } = atlasParseResult;
+            const drawableHandle = this.createDrawableHandle(resolve(url, atlas.relativeImageUrl));
+            this.drawableManager.load(drawableHandle);
+            this.meta.set(handle.symbol, { atlasJsonHandle, drawableHandle, atlas });
+            return {
+                status: LoadResultStatus.DEFERRED,
+                dependencies: [drawableHandle],
+            };
+        }
+        // All loaded.
+        const { drawableHandle, atlas } = meta;
+        return {
+            status: LoadResultStatus.SUCCESS,
+            data: new SpriteAnimated(drawableHandle!, atlas!),
+        };
     }
 
     private loaderSpriteSimple(url: string, handle: ResourceHandle<Sprite<TResource>>): LoadResult<Sprite<TResource>> {
@@ -70,12 +132,14 @@ export class SpriteManager<TResource> extends BaseSpecificResourceManager<
     }
 
     protected async loader(
-        { url, type }: SpriteLoadOptions,
+        options: SpriteLoadOptions,
         handle: ResourceHandle<Sprite<TResource>>,
     ): Promise<LoadResult<Sprite<TResource>>> {
-        switch (type) {
+        switch (options.type) {
             case SpriteType.SIMPLE:
-                return this.loaderSpriteSimple(url, handle);
+                return this.loaderSpriteSimple(options.url, handle);
+            case SpriteType.ANIMATED:
+                return this.loaderSpriteAnimated(options.url, options.atlasParser, handle);
         }
     }
 }

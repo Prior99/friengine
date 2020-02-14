@@ -4,7 +4,7 @@ import { Animation } from "./animation";
 export class Atlas {
     private animations = new Map<string, Animation>();
 
-    constructor(public frames: Frame[], animations?: Animation[]) {
+    constructor(public relativeImageUrl: string, public frames: Frame[], animations?: Animation[]) {
         if (animations) {
             animations.forEach(animation => this.animations.set(animation.name, animation));
         } else {
