@@ -11,6 +11,7 @@ export function parseAsepriteAnimationDirection(direction: AsepriteFrameTagDirec
 }
 
 export function parseAsepriteAtlas(input: unknown): AtlasParserResult {
+    console.log(input)
     if (!isAsepriteAtlas(input)) {
         return { status: AtlasParserStatus.ERROR };
     }
