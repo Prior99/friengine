@@ -185,6 +185,8 @@ describe("ResourceManager", () => {
 
             it("is not done", () => expect(resourceManager.done).toBe(false));
 
+            it("is not done for resource", () => expect(resourceManager.resourceDone(handle1)).toBe(false));
+
             it("is not done for type type1", () =>
                 expect(resourceManager.search({ type: type1, status: LoadStatus.DONE })).toHaveLength(0));
 
@@ -209,6 +211,8 @@ describe("ResourceManager", () => {
                 it("is done for type type1", () => expect(resourceManager.doneForType(type1)).toBe(false));
 
                 it("is not done", () => expect(resourceManager.done).toBe(false));
+
+                it("is done for resource", () => expect(resourceManager.resourceDone(handle1)).toBe(true));
 
                 it("promise 1 waiting for resource 3 didn't resolve", () =>
                     expect(waitForResource3Resolved1).toBe(false));
