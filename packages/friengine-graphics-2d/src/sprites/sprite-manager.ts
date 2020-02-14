@@ -87,7 +87,7 @@ export class SpriteManager<TResource> extends BaseSpecificResourceManager<
         }
         const { atlasJsonHandle } = meta;
         // Atlas loaded, but drawable handle not.
-        if (atlasJsonHandle && this.resourceManager.resourceDone(atlasJsonHandle) && !meta.drawableHandle) {
+        if (atlasJsonHandle && this.resourceManager.resourceDone(atlasJsonHandle) && !meta.atlas) {
             const atlasParseResult = atlasParser(this.jsonManager.get(atlasJsonHandle));
             if (atlasParseResult.status === AtlasParserStatus.ERROR) {
                 return {
