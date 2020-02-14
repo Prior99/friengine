@@ -33,6 +33,7 @@
         "ts-jest": "^25.2.0"
     },
     "dependencies": {
+        "friengine-atlas": "^0.0.0",
         "winston": "^3.2.1"
     }
 }
