@@ -31,6 +31,28 @@ export class Rect {
     public get bottomRight(): Vec2 {
         return this.topLeft.add(this.dimensions);
     }
+
+    public clamp(vec2: Vec2): Vec2 {
+        return new Vec2(
+            Math.max(Math.min(vec2.x, this.bottomRight.x), this.topLeft.x),
+            Math.max(Math.min(vec2.y, this.bottomRight.y), this.topLeft.y),
+        );
+    }
+
+    public offset(offset: Vec2): Rect {
+        return new Rect(this.topLeft.add(offset), this.dimensions);
+    }
+
+    public subRect(other: Rect): Rect {
+        return this.intersect(other.offset(this.topLeft));
+    }
+
+    public intersect(other: Rect): Rect {
+        const topLeft = this.clamp(other.topLeft);
+        const bottomRight = this.clamp(other.bottomRight);
+        const dimensions = bottomRight.sub(topLeft);
+        return new Rect(topLeft, dimensions);
+    }
 }
 
 export function rect(topLeft: Vec2, dimensions: Vec2): Rect;

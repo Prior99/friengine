@@ -24,12 +24,20 @@ export class Vec2 {
         return this.div(this.length);
     }
 
-    public get min(): number {
+    public get minComponent(): number {
         return Math.min(this.x, this.y);
     }
 
-    public get max(): number {
+    public get maxComponent(): number {
         return Math.max(this.x, this.y);
+    }
+
+    public min(other: Vec2): Vec2 {
+        return new Vec2(Math.min(this.x, other.x), Math.min(this.y, other.y));
+    }
+
+    public max(other: Vec2): Vec2 {
+        return new Vec2(Math.max(this.x, other.x), Math.max(this.y, other.y));
     }
 
     public add(other: number | Vec2): Vec2 {

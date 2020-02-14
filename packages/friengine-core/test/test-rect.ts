@@ -1,6 +1,8 @@
 import { rect, vec2, Rect } from "../src";
 
 describe("Rect", () => {
+    let testRect: Rect;
+
     describe.each([
         {
             topLeft: vec2(0, 0),
@@ -23,11 +25,9 @@ describe("Rect", () => {
             bottomLeft: vec2(5, 5),
             topRight: vec2(5, 5),
         },
-    ])("test %#", ({ topLeft, dimensions, bottomRight, bottomLeft, topRight}) => {
-        let testRect: Rect;
-
+    ])("test %#", ({ topLeft, dimensions, bottomRight, bottomLeft, topRight }) => {
         describe("with vec2 as constructor arguments", () => {
-            beforeEach(() => testRect = rect(topLeft, dimensions));
+            beforeEach(() => (testRect = rect(topLeft, dimensions)));
 
             it("has correct topLeft", () => expect(testRect.topLeft).toEqual(topLeft));
 
@@ -41,7 +41,7 @@ describe("Rect", () => {
         });
 
         describe("with number as constructor arguments", () => {
-            beforeEach(() => testRect = rect(topLeft.x, topLeft.y, dimensions.x, dimensions.y));
+            beforeEach(() => (testRect = rect(topLeft.x, topLeft.y, dimensions.x, dimensions.y)));
 
             it("has correct topLeft", () => expect(testRect.topLeft).toEqual(topLeft));
 
@@ -53,9 +53,71 @@ describe("Rect", () => {
 
             it("has correct dimensions", () => expect(testRect.dimensions).toEqual(dimensions));
         });
+
+        describe("offset", () => {
+            beforeEach(() => (testRect = rect(10, 10, 40, 40)));
+
+            it("positive", () => expect(testRect.offset(vec2(20, 5))).toEqual(rect(30, 15, 40, 40)));
+
+            it("zero", () => expect(testRect.offset(vec2(0, 0))).toEqual(rect(10, 10, 40, 40)));
+
+            it("negative", () => expect(testRect.offset(vec2(-10, -20))).toEqual(rect(0, -10, 40, 40)));
+        });
+
+        describe("clamp", () => {
+            beforeEach(() => (testRect = rect(10, 10, 40, 40)));
+
+            it("inside", () => expect(testRect.clamp(vec2(20, 20))).toEqual(vec2(20, 20)));
+
+            it("above", () => expect(testRect.clamp(vec2(20, 5))).toEqual(vec2(20, 10)));
+
+            it("left of", () => expect(testRect.clamp(vec2(5, 20))).toEqual(vec2(10, 20)));
+
+            it("right of", () => expect(testRect.clamp(vec2(60, 20))).toEqual(vec2(50, 20)));
+
+            it("below", () => expect(testRect.clamp(vec2(20, 60))).toEqual(vec2(20, 50)));
+
+            it("below and right of", () => expect(testRect.clamp(vec2(60, 60))).toEqual(vec2(50, 50)));
+
+            it("top and left of", () => expect(testRect.clamp(vec2(0, 0))).toEqual(vec2(10, 10)));
+        });
     });
 
-    it.each([ { topLeft: vec2(0, 0), dimensions: vec2(10, 10)}])("#j is not a rect", (v) => expect(Rect.isRect(v)).toBe(false));
+    describe("subRect", () => {
+        beforeEach(() => (testRect = rect(10, 20, 40, 30)));
 
-    it.each([rect(0, 0, 1, 1), new Rect(0, 0, 10, 10)])("#j is a rect", (v) => expect(Rect.isRect(v)).toBe(true));
+        it("inside", () => expect(testRect.subRect(rect(10, 10, 5, 5))).toEqual(rect(20, 30, 5, 5)));
+
+        it("overlapping above and left of", () =>
+            expect(testRect.subRect(rect(-5, -15, 10, 20))).toEqual(rect(10, 20, 5, 5)));
+
+        it("overlapping below and right of", () =>
+            expect(testRect.subRect(rect(35, 25, 10, 10))).toEqual(rect(45, 45, 5, 5)));
+
+        it("outside", () => expect(testRect.subRect(rect(10, 35, 5, 5))).toEqual(rect(20, 50, 5, 0)));
+
+        it("outside corner", () => expect(testRect.intersect(rect(100, 100, 5, 5))).toEqual(rect(50, 50, 0, 0)));
+    });
+
+    describe("intersect", () => {
+        beforeEach(() => (testRect = rect(10, 20, 40, 30)));
+
+        it("inside", () => expect(testRect.intersect(rect(20, 30, 5, 5))).toEqual(rect(20, 30, 5, 5)));
+
+        it("overlapping above and left of", () =>
+            expect(testRect.intersect(rect(5, 5, 20, 20))).toEqual(rect(10, 20, 15, 5)));
+
+        it("overlapping below and right of", () =>
+            expect(testRect.intersect(rect(45, 45, 10, 10))).toEqual(rect(45, 45, 5, 5)));
+
+        it("outside", () => expect(testRect.intersect(rect(10, 55, 5, 5))).toEqual(rect(10, 50, 5, 0)));
+
+        it("outside corner", () => expect(testRect.intersect(rect(100, 100, 5, 5))).toEqual(rect(50, 50, 0, 0)));
+    });
+
+    it.each([{ topLeft: vec2(0, 0), dimensions: vec2(10, 10) }])("#j is not a rect", v =>
+        expect(Rect.isRect(v)).toBe(false),
+    );
+
+    it.each([rect(0, 0, 1, 1), new Rect(0, 0, 10, 10)])("#j is a rect", v => expect(Rect.isRect(v)).toBe(true));
 });

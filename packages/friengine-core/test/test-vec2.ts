@@ -10,9 +10,9 @@ describe("vec2", () => {
 
         it("swapped", () => expect(v.swapped).toEqual(vec2(20, 10)));
 
-        it("min", () => expect(v.min).toEqual(10));
+        it("min", () => expect(v.minComponent).toEqual(10));
 
-        it("max", () => expect(v.max).toEqual(20));
+        it("max", () => expect(v.maxComponent).toEqual(20));
 
         it("equals itself", () => expect(v.equals(v)).toBe(true));
 
@@ -51,6 +51,10 @@ describe("vec2", () => {
         it("mod", () => expect(v1.mod(v2)).toEqual(vec2(5, 0)));
 
         it("distance", () => expect(v1.distance(v2)).toBe(5));
+
+        it("finds minimum", () => expect(v1.min(vec2(6, 7))).toEqual(vec2(5, 7)));
+
+        it("finds maximum", () => expect(v1.max(vec2(6, 7))).toEqual(vec2(6, 10)));
     });
 
     it.each([{ x: 1, y: 2}, 7, [1, 2]])("#j is not a vec2", (v) => expect(Vec2.isVec2(v)).toBe(false));
