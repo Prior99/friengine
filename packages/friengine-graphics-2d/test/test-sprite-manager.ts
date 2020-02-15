@@ -1,7 +1,7 @@
 import { SpriteManager, SpriteSimple, SpriteAnimated } from "../src";
 import { ResourceManager, ResourceHandle, JsonManager, rect } from "friengine-core";
 import { TextureManager, ImageManager, Texture } from "friengine-graphics";
-import { createGl } from "friengine-test-utils";
+import { createGl, createAtlas } from "friengine-test-utils";
 import { Atlas, AtlasParserStatus } from "friengine-atlas";
 
 describe("SpriteManager", () => {
@@ -78,12 +78,7 @@ describe("SpriteManager", () => {
                 jsonHandle = JsonManager.add("http://example.com/something.json");
                 spyLoadJson = jest.spyOn(jsonManager, "load");
                 spyCreateJsonHandle = jest.spyOn(JsonManager, "add").mockImplementation(() => jsonHandle);
-                atlas = new Atlas("image.png", [
-                    { rect: rect(0, 0, 8, 8), duration: 100 },
-                    { rect: rect(8, 0, 8, 8), duration: 200 },
-                    { rect: rect(16, 0, 8, 8), duration: 300 },
-                    { rect: rect(24, 0, 8, 8), duration: 400 },
-                ]);
+                atlas = createAtlas();
                 spyAtlasParser = jest.fn(() => ({ status: AtlasParserStatus.SUCCESS, atlas }));
                 handle = SpriteManager.addAnimated(someUrl, spyAtlasParser);
                 spriteManager.load(handle);

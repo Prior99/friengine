@@ -39,7 +39,7 @@ describe("GraphicsLayer2d", () => {
             testLayer = new TestLayer();
             graphics.addLayer(testLayer);
 
-            handle = SpriteManager.addSimple<Texture>(path.join(__dirname, "assets", "test.png"));
+            handle = SpriteManager.addSimple(path.join(__dirname, "assets", "test.png"));
             spriteManager.load(handle);
             await spriteManager.waitUntilFinished();
             sprite = spriteManager.get(handle);
@@ -90,7 +90,7 @@ describe("GraphicsLayer2d", () => {
             testLayer = new TestLayer();
             graphics.addLayer(testLayer);
 
-            handle = SpriteManager.addAnimated<Texture>(
+            handle = SpriteManager.addAnimated(
                 path.join(__dirname, "assets", "digits.json"),
                 parseAsepriteAtlas,
             );
