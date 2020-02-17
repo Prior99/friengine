@@ -1,0 +1,39 @@
+{
+    "name": "friengine-maps",
+    "version": "0.0.0",
+    "description": "2D Maps for friengine.",
+    "main": "dist/index.js",
+    "author": "Frederick Gnodtke",
+    "license": "MIT",
+    "private": false,
+    "scripts": {
+        "build": "tsc -p .",
+        "test": "jest",
+        "lint": "eslint --max-warnings 0 src/**/*.ts test/**/*.ts"
+    },
+    "eslintConfig": {
+        "extends": "../../eslint-defaults.json"
+    },
+    "jest": {
+        "preset": "../../jest-defaults.json"
+    },
+    "dependencies": {
+        "friengine-core": "^0.0.0",
+        "friengine-graphics-2d": "^0.0.0"
+    },
+    "devDependencies": {
+        "@types/jest": "^25.1.2",
+        "@types/node": "^13.7.0",
+        "@types/typescript": "^2.0.0",
+        "@typescript-eslint/eslint-plugin": "^2.19.0",
+        "@typescript-eslint/parser": "^2.19.0",
+        "eslint": "^6.8.0",
+        "eslint-config-prettier": "^6.10.0",
+        "eslint-plugin-jest": "^23.6.0",
+        "eslint-plugin-prettier": "^3.1.2",
+        "friengine-test-utils": "^0.0.0",
+        "jest": "^25.1.0",
+        "prettier": "^1.19.1",
+        "ts-jest": "^25.2.0"
+    }
+}

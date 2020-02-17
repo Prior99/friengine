@@ -1,6 +1,6 @@
 import { Sprite, SpriteDrawOptions } from "./sprite";
 import { ResourceDrawer2d } from "../resource-drawer-2d";
-import { ResourceHandle } from "friengine-core/src";
+import { ResourceHandle } from "friengine-core";
 
 export class SpriteSimple<TResource> extends Sprite<TResource> {
     constructor(protected handle: ResourceHandle<TResource>) {
