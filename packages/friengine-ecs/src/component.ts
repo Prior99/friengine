@@ -1,4 +1,4 @@
-import { Constructable } from "friengine-core/src";
+import { Constructable } from "friengine-core";
 
 export type ComponentClass = Constructable<Component, []>;
 
