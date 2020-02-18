@@ -1,7 +1,7 @@
 import { Atlas } from "friengine-atlas";
 import { rect } from "friengine-core";
 
-export function createAtlas() {
+export function createAtlas(): Atlas {
     return new Atlas("image.png", [
         { rect: rect(0, 0, 8, 8), duration: 100 },
         { rect: rect(8, 0, 8, 8), duration: 200 },

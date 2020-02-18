@@ -6,6 +6,7 @@ import {
     LoadResult,
     LoadResultStatus,
     JsonManager,
+    Rect,
 } from "friengine-core";
 import { Sprite } from "./sprite";
 import { SpriteSimple } from "./sprite-simple";
@@ -18,6 +19,7 @@ export const RESOURCE_TYPE_SPRITE = Symbol("ResourceTypeSprite");
 export enum SpriteType {
     SIMPLE = "simple",
     ANIMATED = "animated",
+    TILE = "tile",
 }
 
 export interface SpriteSimpleLoadOptions {
@@ -31,7 +33,13 @@ export interface SpriteAnimatedLoadOptions {
     atlasParser: AtlasParser;
 }
 
-export type SpriteLoadOptions = SpriteSimpleLoadOptions | SpriteAnimatedLoadOptions;
+export interface SpriteTileLoadOptions {
+    url: string;
+    type: SpriteType.TILE;
+    subRect: Rect;
+}
+
+export type SpriteLoadOptions = SpriteSimpleLoadOptions | SpriteAnimatedLoadOptions | SpriteTileLoadOptions;
 
 interface SpriteMeta<TResource> {
     drawableHandle?: ResourceHandle<TResource>;
@@ -48,6 +56,13 @@ export class SpriteManager<TResource> extends BaseSpecificResourceManager<
         return ResourceManager.add({
             type: RESOURCE_TYPE_SPRITE,
             options: { url, type: SpriteType.SIMPLE },
+        });
+    }
+
+    static addTile<TResource>(url: string, subRect: Rect): ResourceHandle<SpriteSimple<TResource>> {
+        return ResourceManager.add({
+            type: RESOURCE_TYPE_SPRITE,
+            options: { url, type: SpriteType.TILE, subRect },
         });
     }
 
@@ -112,6 +127,25 @@ export class SpriteManager<TResource> extends BaseSpecificResourceManager<
         };
     }
 
+    private loaderSpriteTile(url: string, subRect: Rect, handle: ResourceHandle<Sprite<TResource>>): LoadResult<Sprite<TResource>> {
+        const meta = this.meta.get(handle.symbol);
+        if (meta && meta.drawableHandle && this.resourceManager.resourceDone(meta.drawableHandle)) {
+            this.meta.delete(handle.symbol);
+            return {
+                status: LoadResultStatus.SUCCESS,
+                data: new SpriteTile(meta.drawableHandle, subRect),
+            };
+        }
+        const drawableHandle = this.createDrawableHandle(url);
+        this.meta.set(handle.symbol, { drawableHandle });
+
+        this.drawableManager.load(drawableHandle);
+        return {
+            status: LoadResultStatus.DEFERRED,
+            dependencies: [drawableHandle],
+        };
+    }
+
     private loaderSpriteSimple(url: string, handle: ResourceHandle<Sprite<TResource>>): LoadResult<Sprite<TResource>> {
         const meta = this.meta.get(handle.symbol);
         if (meta && meta.drawableHandle && this.resourceManager.resourceDone(meta.drawableHandle)) {
@@ -138,6 +172,8 @@ export class SpriteManager<TResource> extends BaseSpecificResourceManager<
         switch (options.type) {
             case SpriteType.SIMPLE:
                 return this.loaderSpriteSimple(options.url, handle);
+            case SpriteType.TILE:
+                return this.loaderSpriteTile(options.url, options.subRect, handle);
             case SpriteType.ANIMATED:
                 return this.loaderSpriteAnimated(options.url, options.atlasParser, handle);
         }

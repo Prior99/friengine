@@ -1,5 +1,4 @@
-import { TileSet } from "./tile-set";
-import { TileType } from "./tile-type";
+import { TileSet, TileType } from "./tile-set";
 
 export interface IndexedTileSet<TResource> {
     tileSet: TileSet<TResource>;

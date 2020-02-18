@@ -57,6 +57,10 @@ export class Rect {
     public resize(newSize: Vec2): Rect {
         return new Rect(this.topLeft, newSize);
     }
+
+    public contains(point: Vec2): boolean {
+        return point.greaterThanOrEqual(this.topLeft) && point.lessThan(this.bottomRight);
+    }
 }
 
 export function rect(topLeft: Vec2, dimensions: Vec2): Rect;

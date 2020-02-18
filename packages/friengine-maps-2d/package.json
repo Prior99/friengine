@@ -1,5 +1,5 @@
 {
-    "name": "friengine-maps",
+    "name": "friengine-maps-2d",
     "version": "0.0.0",
     "description": "2D Maps for friengine.",
     "main": "dist/index.js",

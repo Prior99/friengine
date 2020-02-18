@@ -83,6 +83,21 @@ export class Vec2 {
         return Math.sqrt(Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2));
     }
 
+    public greaterThan(other: Vec2): boolean {
+        return this.x > other.x && this.y > other.y;
+    }
+
+    public greaterThanOrEqual(other: Vec2): boolean {
+        return this.x >= other.x && this.y >= other.y;
+    }
+
+    public lessThan(other: Vec2): boolean {
+        return this.x < other.x && this.y < other.y;
+    }
+
+    public lessThanOrEqual(other: Vec2): boolean {
+        return this.x <= other.x && this.y <= other.y;
+    }
 }
 
 export function vec2(x: number, y: number): Vec2 {

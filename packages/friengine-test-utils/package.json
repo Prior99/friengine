@@ -29,6 +29,11 @@
     },
     "dependencies": {
         "node-gles": "^0.0.16",
-        "node-libpng": "^0.2.13"
+        "node-libpng": "^0.2.13",
+        "friengine-ecs": "^0.0.0",
+        "friengine-graphics": "^0.0.0",
+        "friengine-graphics-2d": "^0.0.0",
+        "friengine-maps-2d": "^0.0.0",
+        "friengine-atlas": "^0.0.0"
     }
 }
