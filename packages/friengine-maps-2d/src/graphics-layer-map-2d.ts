@@ -1,4 +1,4 @@
-import { Constructable } from "friengine-core";
+import { Constructable, vec2 } from "friengine-core";
 import { Shader2d, GraphicsLayer2d, SpriteManager } from "friengine-graphics-2d";
 import { Texture } from "friengine-graphics/src";
 import { Map2d } from "./map-2d";
@@ -16,7 +16,10 @@ export class GraphicsLayerMap2d extends GraphicsLayer2d {
     private renderTile(tile: Tile<Texture>): void {
         const { tileType, position } = tile;
         if (tileType) {
-            const dest = position.mult(this.map.tileDimensions);
+            const dest = position
+                .mult(this.map.tileDimensions)
+                .sub(vec2(0, tileType.dimensions.y - this.map.tileDimensions.y))
+                .add(tileType.offset ?? vec2(0, 0));
             this.spriteManager.get(tileType.spriteHandle).draw(this, { dest });
         }
     }
