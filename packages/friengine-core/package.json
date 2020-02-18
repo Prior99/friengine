@@ -20,6 +20,7 @@
     "devDependencies": {
         "@types/jest": "^25.1.2",
         "@types/node": "^13.7.0",
+        "@types/ramda": "^0.26.41",
         "@types/typescript": "^2.0.0",
         "@types/winston": "^2.4.4",
         "@typescript-eslint/eslint-plugin": "^2.19.0",
@@ -33,6 +34,7 @@
         "ts-jest": "^25.2.0"
     },
     "dependencies": {
+        "ramda": "^0.27.0",
         "winston": "^3.2.1"
     }
 }

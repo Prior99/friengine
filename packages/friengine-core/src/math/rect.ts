@@ -61,6 +61,10 @@ export class Rect {
     public contains(point: Vec2): boolean {
         return point.greaterThanOrEqual(this.topLeft) && point.lessThan(this.bottomRight);
     }
+
+    public get area(): number {
+        return this.dimensions.x * this.dimensions.y;
+    }
 }
 
 export function rect(topLeft: Vec2, dimensions: Vec2): Rect;

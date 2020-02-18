@@ -2,6 +2,7 @@ import { logger } from "./utils";
 import { ResourceHandle } from "./resource-handle";
 import { LoadStatus, Resource, DoneResource, UnfinishedResource } from "./resource";
 import { LoadResultStatus, LoadResult } from "./load-result";
+import { equals } from "ramda";
 
 export interface ResourceLoader<T> {
     type: symbol;
@@ -24,7 +25,21 @@ export interface ResourceSearchOptions {
 }
 
 export class ResourceManager {
+    public static getMatchingHandle<T>(loader: ResourceLoader<T>): ResourceHandle<T> | undefined {
+        for (const [symbol, { type, options }] of this.registry.entries()) {
+            if (type === loader.type && equals(options, loader.options)) {
+                return { symbol };
+            }
+        }
+        return undefined;
+    }
+
     public static add<T>(loader: ResourceLoader<T>): ResourceHandle<T> {
+        const existingHandle = ResourceManager.getMatchingHandle(loader);
+        if (existingHandle) {
+            logger.debug("Re-using existing resource handle.");
+            return existingHandle;
+        }
         logger.debug("Added new resource handle.");
         const handle = {
             symbol: Symbol(),

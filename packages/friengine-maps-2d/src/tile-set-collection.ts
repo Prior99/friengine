@@ -19,7 +19,7 @@ export class TileSetCollection<TResource> {
     private getIndexedTileSetForTile(tileId: number): IndexedTileSet<TResource> | undefined {
         for (const indexedTileSet of this.tileSets) {
             const { index, tileSet } = indexedTileSet;
-            if (tileId < index + tileSet.count) {
+            if (tileId < index + tileSet.upperLimit) {
                 return indexedTileSet;
             }
         }

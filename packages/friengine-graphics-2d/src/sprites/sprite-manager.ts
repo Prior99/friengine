@@ -13,6 +13,7 @@ import { SpriteSimple } from "./sprite-simple";
 import { AtlasParser, Atlas, AtlasParserStatus } from "friengine-atlas";
 import { SpriteAnimated } from "./sprite-animated";
 import { resolve } from "url";
+import { SpriteTile } from "./sprite-tile";
 
 export const RESOURCE_TYPE_SPRITE = Symbol("ResourceTypeSprite");
 
