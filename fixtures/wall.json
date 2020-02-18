@@ -1,0 +1,14 @@
+{ "columns":4,
+ "image":"packages\/friengine-test-utils\/src\/assets\/wall.png",
+ "imageheight":24,
+ "imagewidth":64,
+ "margin":0,
+ "name":"wall",
+ "spacing":0,
+ "tilecount":4,
+ "tiledversion":"1.3.2",
+ "tileheight":24,
+ "tilewidth":16,
+ "type":"tileset",
+ "version":1.2
+}

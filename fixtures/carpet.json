@@ -1,0 +1,14 @@
+{ "columns":3,
+ "image":"packages\/friengine-test-utils\/src\/assets\/carpet.png",
+ "imageheight":48,
+ "imagewidth":48,
+ "margin":0,
+ "name":"carpet",
+ "spacing":0,
+ "tilecount":9,
+ "tiledversion":"1.3.2",
+ "tileheight":16,
+ "tilewidth":16,
+ "type":"tileset",
+ "version":1.2
+}
