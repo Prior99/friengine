@@ -18,7 +18,7 @@ describe("tile set types", () => {
             },
             {
                 image: "image.png",
-                imageheight: 16,
+                imagewidth: 16,
             },
         ])("doesn't pass %j", (input: any) => expect(isTiledImage(input)).toBe(false));
 
