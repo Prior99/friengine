@@ -67,8 +67,48 @@ export const objectPolygon = {
 export const objectEllipse = {
     ...objectBase,
     ellipse: true,
-}
+};
 
 export const objectRect = {
     ...objectBase,
+};
+
+export const image = {
+    image: "image.png",
+    imagewidth: 32,
+    imageheight: 32,
+};
+
+export const grid = {
+    orientation: "orthogonal",
+    width: 1,
+    height: 1,
+};
+
+export const tileSetBase = {
+    name: "base",
+    version: 1.2,
+    type: "tileset",
+    tilewidth: 16,
+    tileheight: 16,
+    tiledversion: "1.3.2",
+    tilecount: 4,
+};
+
+export const tileSetSheet = {
+    ...tileSetBase,
+    columns: 2,
+    margin: 0,
+    spacing: 0,
+};
+
+export const tile = {
+    ...image,
+    id: 18,
+};
+
+export const tileSetCollection = {
+    ...tileSetBase,
+    grid,
+    tiles: [],
 };
