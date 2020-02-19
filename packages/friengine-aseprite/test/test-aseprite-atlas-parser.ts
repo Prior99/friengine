@@ -5,6 +5,7 @@ import { parseAsepriteAtlas } from "../src";
 describe("parseAsepriteAtlas", () => {
     it("returns error with bad input", () =>
         expect(parseAsepriteAtlas(null)).toEqual({ status: AtlasParserStatus.ERROR }));
+
     it("parses example", () =>
         expect(
             parseAsepriteAtlas({
@@ -72,5 +73,23 @@ describe("parseAsepriteAtlas", () => {
                     new Animation("Animation 3", 0, 2, AnimationDirection.PING_PONG),
                 ],
             ),
+        }));
+
+    it("parses minimal example", () =>
+        expect(
+            parseAsepriteAtlas({
+                frames: {},
+                meta: {
+                    app: "http://www.aseprite.org/",
+                    version: "1.3-dev",
+                    image: "example.png",
+                    format: "I8",
+                    size: { w: 256, h: 24 },
+                    scale: "1",
+                },
+            }),
+        ).toEqual({
+            status: AtlasParserStatus.SUCCESS,
+            atlas: new Atlas("example.png", [], [new Animation("default", 0, -1, AnimationDirection.FORWARD)]),
         }));
 });

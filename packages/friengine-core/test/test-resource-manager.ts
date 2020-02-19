@@ -143,6 +143,14 @@ describe("ResourceManager", () => {
             handle3 = ResourceManager.add(loader3.loader);
         });
 
+        describe("adding a resource again", () => {
+            let handle1Copy: ResourceHandle<string>;
+
+            beforeEach(() => handle1Copy = ResourceManager.add(loader1.loader));
+
+            it("returns the exact same handle", () => expect(handle1Copy.symbol).toBe(handle1.symbol));
+        });
+
         it("can get all resource handles for a type", () =>
             expect(ResourceManager.getHandlesForType(type1)).toEqual([handle1]));
 
@@ -182,6 +190,9 @@ describe("ResourceManager", () => {
 
             it("returns all resources for type1", () =>
                 expect(resourceManager.search({ type: type1 })).toEqual([resource1, resource2]));
+
+            it("returns all resources", () =>
+                expect(resourceManager.search()).toEqual([resource1, resource2, resource3]));
 
             it("is not done", () => expect(resourceManager.done).toBe(false));
 
