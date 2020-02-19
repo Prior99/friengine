@@ -11,7 +11,7 @@ export interface Map2dObject {
 }
 
 export class Map2dLayer {
-    constructor(public area: Rect, public objects: Map2dObject[] = [], public data: number[]) {
+    constructor(public area: Rect, public data: number[], public objects: Map2dObject[] = []) {
         if (data.length !== area.area) {
             throw new Error(`Invalid data for map layer. Expected ${area.area} ids, but got ${data.length}.`);
         }

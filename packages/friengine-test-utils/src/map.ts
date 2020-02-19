@@ -51,18 +51,17 @@ export function createMap(): Map2d<Texture> {
     const layers = [
         new Map2dLayer(
             rect(0, 0, 7, 7),
-            [],
             // eslint-ignore-next-line
             [0, 0, 0, 0, 0, 0, 0, 0, 5, 6, 6, 6, 7, 0, 0, 8, 9, 9, 9, 10, 0, 0, 8, 9, 9, 9, 10, 0, 0, 8, 9, 9, 9, 10, 0, 0, 11, 12, 12, 12, 13, 0, 0, 0, 0, 0, 0, 0, 0],
         ),
         new Map2dLayer(
             rect(0, 0, 7, 7),
+            // eslint-ignore-next-line
+            [1, 4, 1, 3, 4, 4, 2, 3, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 16, 15, 4, 2, 0, 0, 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 1, 1, 14, 0, 0, 0, 0, 4, 1, 3, 4, 1, 1, 4, 3],
             [
                 { id: 1, name: "Object 1", type: "type-1", position: vec2(3, 3) },
                 { id: 2, name: "Object 2", type: "type-2", position: vec2(3, 3) },
             ],
-            // eslint-ignore-next-line
-            [1, 4, 1, 3, 4, 4, 2, 3, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 16, 15, 4, 2, 0, 0, 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 1, 1, 14, 0, 0, 0, 0, 4, 1, 3, 4, 1, 1, 4, 3],
         ),
     ];
     return new Map2d(vec2(7, 7), vec2(16, 16), layers, tileSets);
