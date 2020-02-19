@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { TiledPosition, isTiledPosition, TiledDimensions, isTiledDimensions } from "./tiled-common-types";
-import { TiledObject } from "./tiled-object-types";
+import { TiledObject, isTiledObject } from "./tiled-object-types";
 
 export type TiledDrawOrder = "topdown" | "index";
 
@@ -41,8 +41,7 @@ export function isTiledLayerObjects(layerObjects: any): layerObjects is TiledLay
     if (!isTiledDrawOrder(layerObjects.draworder)) { return false; }
     if (layerObjects.type !== "objectgroup") { return false; }
     if (!Array.isArray(layerObjects.objects)) { return false; }
-    if (layerObjects.objects.length > 0 && layerObjects.objects.some(object => !isTiledObject(object))) { return false; }
-    if (typeof layerObjects.opacity !== "number") { return false; }
+    if (layerObjects.objects.length > 0 && layerObjects.objects.some((obj: any) => !isTiledObject(obj))) { return false; }
     if (!isTiledLayerBase(layerObjects)) { return false; }
     return true;
 }

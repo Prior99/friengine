@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { TiledTileSet } from "./tiled-tile-set-types";
+import { TiledTileSet, isTiledTileSet } from "./tiled-tile-set-types";
 import { TiledLayer, isTiledLayer } from "./tiled-layer-types";
 import { TiledDimensions, TiledOrientation, isTiledOrientation } from "./tiled-common-types";
 
@@ -68,10 +68,10 @@ export function isTiledMap(map: any): map is TiledMap {
     if (typeof map.infinite !== "boolean") {
         return false;
     }
-    if (Array.isArray(map.layers)) {
+    if (!Array.isArray(map.layers)) {
         return false;
     }
-    if (map.layers.length > 0 && map.layer.some(layer => !isTiledLayer(layer))) {
+    if (map.layers.length > 0 && map.layers.some((layer: any) => !isTiledLayer(layer))) {
         return false;
     }
     if (typeof map.nextlayerid !== "number") {
@@ -98,7 +98,7 @@ export function isTiledMap(map: any): map is TiledMap {
     if (map.tilesets.length > 0 && map.tilesets.some((tileset: any) => !isTiledTileSet(tileset))) {
         return false;
     }
-    if (map.type !== map) {
+    if (map.type !== "map") {
         return false;
     }
     if (typeof map.version !== "number") {

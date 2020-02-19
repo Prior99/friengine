@@ -59,10 +59,10 @@ export function isTiledObjectPolygon(objectPolygon: any): objectPolygon is Tiled
     if (!Array.isArray(objectPolygon.polygon)) {
         return false;
     }
-    if (objectPolygon.polygon.length > 0 && objectPolygon.polygon.some(point => !isTiledPosition(point))) {
+    if (objectPolygon.polygon.length > 0 && objectPolygon.polygon.some((point: any) => !isTiledPosition(point))) {
         return false;
     }
-    if (!isTiledObjectBase(objectPoint)) {
+    if (!isTiledObjectBase(objectPolygon)) {
         return false;
     }
     return true;
