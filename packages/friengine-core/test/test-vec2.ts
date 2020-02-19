@@ -55,6 +55,18 @@ describe("vec2", () => {
         it("finds minimum", () => expect(v1.min(vec2(6, 7))).toEqual(vec2(5, 7)));
 
         it("finds maximum", () => expect(v1.max(vec2(6, 7))).toEqual(vec2(6, 10)));
+
+        it("not greaterThan", () => expect(v1.greaterThan(v2)).toBe(false));
+
+        it("greaterThan", () => expect(v1.greaterThan(vec2(1, 1))).toBe(true));
+
+        it("greaterThanOrEqual", () => expect(v1.greaterThanOrEqual(v2)).toBe(false));
+
+        it("not lessThan", () => expect(v1.lessThan(v2)).toBe(false));
+
+        it("lessThan", () => expect(v1.lessThan(vec2(20, 20))).toBe(true));
+
+        it("lessThanOrEqual", () => expect(v1.lessThanOrEqual(v2)).toBe(true));
     });
 
     it.each([{ x: 1, y: 2}, 7, [1, 2]])("#j is not a vec2", (v) => expect(Vec2.isVec2(v)).toBe(false));

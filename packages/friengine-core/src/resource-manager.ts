@@ -55,7 +55,7 @@ export class ResourceManager {
     }
 
     public static reset(): void {
-        ResourceManager.registry = new Map();
+        ResourceManager.registry.clear();
     }
 
     private static registry = new Map<symbol, ResourceLoader<unknown>>();

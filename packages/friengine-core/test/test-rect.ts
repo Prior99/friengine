@@ -117,6 +117,18 @@ describe("Rect", () => {
 
     it("resizing", () => expect(rect(10, 8, 11, 12).resize(vec2(5, 7))).toEqual(rect(10, 8, 5, 7)));
 
+    describe("contains", () => {
+        it("inside", () => expect(rect(5, 6, 10, 4).contains(vec2(7, 7))).toBe(true));
+
+        it("outside x", () => expect(rect(5, 6, 10, 4).contains(vec2(18, 7))).toBe(false));
+
+        it("outside y", () => expect(rect(5, 6, 10, 4).contains(vec2(7, -2))).toBe(false));
+    });
+
+    describe("area", () => {
+        it("area", () => expect(rect(1, 2, 8, 10).area).toBe(80));
+    });
+
     it.each([{ topLeft: vec2(0, 0), dimensions: vec2(10, 10) }])("#j is not a rect", v =>
         expect(Rect.isRect(v)).toBe(false),
     );

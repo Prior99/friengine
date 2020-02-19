@@ -1,4 +1,4 @@
-import { SpriteManager, SpriteSimple, SpriteAnimated } from "../src";
+import { SpriteManager, SpriteSimple, SpriteAnimated, SpriteTile } from "../src";
 import { ResourceManager, ResourceHandle, JsonManager, rect } from "friengine-core";
 import { TextureManager, ImageManager, Texture } from "friengine-graphics";
 import { createGl, createAtlas } from "friengine-test-utils";
@@ -60,6 +60,29 @@ describe("SpriteManager", () => {
 
             it("has the sprite available", () =>
                 expect(spriteManager.get(handle)).toEqual(new SpriteSimple(drawableHandle)));
+        });
+    });
+
+    describe("after adding and loading a tile sprite", () => {
+        let handle: ResourceHandle<SpriteTile<Texture>>;
+        const someUrl = "http://example.com/test.png";
+
+        beforeEach(() => {
+            handle = SpriteManager.addTile(someUrl, rect(10, 20, 5, 5));
+            spriteManager.load(handle);
+        });
+
+        it("knows the handle", () => expect(spriteManager.isKnownHandle(handle)).toBe(true));
+
+        it("creates a drawable handle", () => expect(spyCreateDrawableHandle).toHaveBeenCalledWith(someUrl));
+
+        describe("after waiting for the sprite to finish loading", () => {
+            beforeEach(() => spriteManager.waitUntilFinished());
+
+            it("calls load on the texture manager", () => expect(spyLoadDrawable).toHaveBeenCalledWith(drawableHandle));
+
+            it("has the sprite available", () =>
+                expect(spriteManager.get(handle)).toEqual(new SpriteTile(drawableHandle, rect(10, 20, 5, 5))));
         });
     });
 
