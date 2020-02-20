@@ -25,6 +25,8 @@ export class Map2dLayer {
     public objectsWithin(arg1: Rect | Vec2, absolute = true): Map2dObject[] {
         const area = Rect.isRect(arg1) ? arg1 : rect(arg1, vec2(1, 1));
         const relativeArea = absolute ? area.offset(this.area.topLeft.mult(-1)) : area;
-        return this.objects.filter(obj => relativeArea.contains(obj.position));
+        return this.objects
+            .filter(obj => relativeArea.contains(obj.position))
+            .map(obj => ({ ...obj, position: obj.position.add(this.area.topLeft) }));
     }
 }

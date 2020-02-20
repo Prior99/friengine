@@ -1,6 +1,6 @@
 import { TileSetCollection } from "./tile-set-collection";
 import { TileSet } from "./tile-set";
-import { Vec2, vec2 } from "friengine-core";
+import { Vec2, vec2, rect } from "friengine-core";
 import { Map2dLayer } from "./map-2d-layer";
 import { TileStack, Tile } from "./tile-stack";
 
@@ -22,7 +22,7 @@ export class Map2d<TResource> {
     constructor(
         public dimensions: Vec2,
         public tileDimensions: Vec2,
-        private layers: Map2dLayer[],
+        public layers: Map2dLayer[],
         tileSets: TileSet<TResource>[],
         public drawOrder = DrawOrder.RIGHT_DOWN,
     ) {
@@ -37,6 +37,9 @@ export class Map2d<TResource> {
             const layer = typeof arg2 === "number" ? this.layers[arg2] : arg2;
             if (!layer || !this.layers.includes(layer)) {
                 throw new Error("Unknown layer.");
+            }
+            if (!rect(vec2(0, 0), this.dimensions).contains(position)) {
+                throw new Error("Position out of range.");
             }
             const tileId = layer.tileTypeIdAt(position);
             const tileType = tileId === 0 ? undefined : this.tileSets.byId(tileId);
