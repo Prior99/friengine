@@ -12,7 +12,7 @@ export interface Tile<TResource> {
 export class TileStack<TResource> {
     constructor(public tiles: Tile<TResource>[]) {}
 
-    public allObjects(): Map2dObject[] {
+    public get allObjects(): Map2dObject[] {
         return this.tiles.reduce((result, tile) => {
             result.push(...tile.objects);
             return result;
