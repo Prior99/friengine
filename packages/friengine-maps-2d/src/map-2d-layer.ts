@@ -19,7 +19,7 @@ export class Map2dLayer {
 
     public tileTypeIdAt(position: Vec2, absolute = true): number {
         const relativePosition = absolute ? position.sub(this.area.topLeft) : position;
-        return this.data[relativePosition.x + relativePosition.y * this.area.dimensions.x];
+        return this.data[relativePosition.x + relativePosition.y * this.area.dimensions.x] ?? 0;
     }
 
     public objectsWithin(arg1: Rect | Vec2, absolute = true): Map2dObject[] {
@@ -27,6 +27,6 @@ export class Map2dLayer {
         const relativeArea = absolute ? area.offset(this.area.topLeft.mult(-1)) : area;
         return this.objects
             .filter(obj => relativeArea.contains(obj.position))
-            .map(obj => ({ ...obj, position: obj.position.add(this.area.topLeft) }));
+            .map(obj => (!absolute ? obj : { ...obj, position: obj.position.add(this.area.topLeft) }));
     }
 }

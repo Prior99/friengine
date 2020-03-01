@@ -27,13 +27,15 @@ describe("Map2dLayer", () => {
         it("has correct tile id at relative position", () => expect(layer.tileTypeIdAt(vec2(1, 1), false)).toBe(2));
 
         it("has correct objects within absolute rect", () =>
-            expect(layer.objectsWithin(rect(1, 4, 1, 1))).toEqual([object2]));
+            expect(layer.objectsWithin(rect(1, 4, 1, 1))).toEqual([{ ...object2, position: vec2(1, 4) }]));
 
         it("has correct objects within relative rect", () =>
             expect(layer.objectsWithin(rect(0, 1, 1, 1), false)).toEqual([object2]));
 
-        it("has correct objects within absolute vec", () => expect(layer.objectsWithin(vec2(1, 4))).toEqual([object2]));
+        it("has correct objects within absolute vec", () =>
+            expect(layer.objectsWithin(vec2(1, 4))).toEqual([{ ...object2, position: vec2(1, 4) }]));
 
-        it("has correct objects within relative vec", () => expect(layer.objectsWithin(vec2(0, 1), false)).toEqual([object2]));
+        it("has correct objects within relative vec", () =>
+            expect(layer.objectsWithin(vec2(0, 1), false)).toEqual([object2]));
     });
 });

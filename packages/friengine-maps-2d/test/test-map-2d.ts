@@ -29,7 +29,7 @@ describe("Map2d", () => {
             `"Layer has tile with invalid tile type id (190)."`,
         ));
 
-    it("returns a tilestack when accessing without layer", () =>
+    it("returns a tilestack when accessing without layer", () => {
         expect(map2d.at(vec2(4, 4))).toEqual(
             new TileStack([
                 {
@@ -49,5 +49,6 @@ describe("Map2d", () => {
                     z: 1,
                 },
             ]),
-        ));
+        );
+    });
 });
