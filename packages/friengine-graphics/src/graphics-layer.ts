@@ -21,6 +21,7 @@ export abstract class GraphicsLayer {
     }
 
     public redraw(): void {
+        /* istanbul ignore if */ // This is covered, but istanbul doesn't detect it.
         if (!this.initialized) {
             throw new Error("Tried to redraw an uninitialized layer.");
         }
