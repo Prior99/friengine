@@ -3,6 +3,14 @@ export class Vec2 {
         return obj instanceof Vec2;
     }
 
+    public static min(...vecs: Vec2[]): Vec2 {
+        return new Vec2(Math.min(...vecs.map(vec => vec.x)), Math.min(...vecs.map(vec => vec.y)));
+    }
+
+    public static max(...vecs: Vec2[]): Vec2 {
+        return new Vec2(Math.max(...vecs.map(vec => vec.x)), Math.max(...vecs.map(vec => vec.y)));
+    }
+
     constructor(
         public x: number,
         public y: number,

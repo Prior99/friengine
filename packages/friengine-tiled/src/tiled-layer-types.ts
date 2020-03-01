@@ -34,7 +34,7 @@ export interface TiledLayerObjects extends TiledLayerBase {
 
 }
 
-export function isTiledLayerObjects(layerObjects: any): layerObjects is TiledLayerBase {
+export function isTiledLayerObjects(layerObjects: any): layerObjects is TiledLayerObjects {
     if (typeof layerObjects !== "object" || layerObjects === null) {
         return false;
     }
@@ -53,7 +53,7 @@ export interface TiledLayerTiles extends TiledLayerBase, TiledDimensions, TiledP
     height: number;
 }
 
-export function isTiledLayerTiles(layerTiles: any): layerTiles is TiledLayerBase {
+export function isTiledLayerTiles(layerTiles: any): layerTiles is TiledLayerTiles {
     if (typeof layerTiles !== "object" || layerTiles === null) {
         return false;
     }

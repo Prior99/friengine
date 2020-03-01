@@ -54,6 +54,13 @@ export class Rect {
         return new Rect(topLeft, dimensions);
     }
 
+    public extend(other: Rect): Rect {
+        const topLeft = this.topLeft.min(other.topLeft);
+        const bottomRight = this.bottomRight.max(other.bottomRight);
+        const dimensions = bottomRight.sub(topLeft);
+        return new Rect(topLeft, dimensions);
+    }
+
     public resize(newSize: Vec2): Rect {
         return new Rect(this.topLeft, newSize);
     }

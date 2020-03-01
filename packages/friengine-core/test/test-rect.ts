@@ -99,6 +99,24 @@ describe("Rect", () => {
         it("outside corner", () => expect(testRect.intersect(rect(100, 100, 5, 5))).toEqual(rect(50, 50, 0, 0)));
     });
 
+    describe("extend", () => {
+        beforeEach(() => (testRect = rect(10, 20, 40, 30)));
+
+        it("inside", () => expect(testRect.extend(rect(20, 30, 5, 5))).toEqual(rect(10, 20, 40, 30)));
+
+        it("overlapping above and left of", () =>
+            expect(testRect.extend(rect(5, 5, 20, 20))).toEqual(rect(5, 5, 45, 45)));
+
+        it("overlapping below and right of", () =>
+            expect(testRect.extend(rect(45, 45, 10, 10))).toEqual(rect(10, 20, 35, 25)));
+
+        it("outside", () => expect(testRect.extend(rect(10, 55, 5, 5))).toEqual(rect(10, 20, 40, 40)));
+
+        it("outside corner", () => expect(testRect.extend(rect(100, 100, 5, 5))).toEqual(rect(10, 20, 95, 85)));
+
+        it("outside zero", () => expect(testRect.extend(rect(100, 100, 0, 0))).toEqual(rect(10, 20, 90, 80)));
+    });
+
     describe("intersect", () => {
         beforeEach(() => (testRect = rect(10, 20, 40, 30)));
 

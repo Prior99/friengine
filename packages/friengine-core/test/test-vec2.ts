@@ -1,6 +1,14 @@
 import { vec2, Vec2 } from "../src";
 
 describe("vec2", () => {
+    describe("static min", () => {
+        it("find min", () => expect(Vec2.min(vec2(1, 9), vec2(10, 0), vec2(0, -1))).toEqual(vec2(0, -1)));
+    });
+
+    describe("static max", () => {
+        it("find max", () => expect(Vec2.max(vec2(1, 9), vec2(10, 0), vec2(0, -1))).toEqual(vec2(10, 9)));
+    });
+
     describe("operations on one vector", () => {
         let v: Vec2;
 
