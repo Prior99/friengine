@@ -1,4 +1,4 @@
-import { Map2d, Map2dLayer, TileSet, TileType } from "friengine-maps-2d";
+import { Map2d, Map2dLayer, TileSet, TileType, Map2dShape } from "friengine-maps-2d";
 import { vec2, rect } from "friengine-core";
 import { Texture } from "friengine-graphics";
 import { SpriteManager } from "friengine-graphics-2d";
@@ -61,9 +61,7 @@ export function createMap(): Map2d<Texture> {
                 11, 12, 12, 12, 13,
             ],
             /* eslint-enable */
-            [
-                { id: 1, name: "Object 1", type: "type-1", position: vec2(3, 3) },
-            ]
+            [{ shape: Map2dShape.POINT, id: 1, name: "Object 1", type: "type-1", position: vec2(3, 3) }],
         ),
         new Map2dLayer(
             rect(0, 0, 7, 7),
@@ -79,9 +77,7 @@ export function createMap(): Map2d<Texture> {
                 1, 3, 4, 1, 1, 4, 3,
             ],
             /* eslint-enable */
-            [
-                { id: 2, name: "Object 2", type: "type-2", position: vec2(3, 3) },
-           ],
+            [{ shape: Map2dShape.POINT, id: 2, name: "Object 2", type: "type-2", position: vec2(3, 3) }],
         ),
     ];
     return new Map2d(vec2(7, 7), vec2(16, 16), layers, tileSets);

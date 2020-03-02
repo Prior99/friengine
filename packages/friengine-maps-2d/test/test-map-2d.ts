@@ -1,4 +1,4 @@
-import { Map2d, Map2dLayer, TileStack, DrawOrder, IterationOrder } from "../src";
+import { Map2d, Map2dLayer, TileStack, DrawOrder, IterationOrder, Map2dShape } from "../src";
 import { createMap } from "friengine-test-utils";
 import { Texture } from "friengine-graphics";
 import { vec2, rect } from "friengine-core";
@@ -131,7 +131,7 @@ describe("Map2d", () => {
                         spriteHandle: expect.anything(),
                         dimensions: vec2(16, 16),
                     },
-                    objects: [{ id: 1, name: "Object 1", type: "type-1", position: vec2(4, 4) }],
+                    objects: [{ shape: Map2dShape.POINT,  id: 1, name: "Object 1", type: "type-1", position: vec2(4, 4) }],
                     position: vec2(4, 4),
                     z: 0,
                 },
