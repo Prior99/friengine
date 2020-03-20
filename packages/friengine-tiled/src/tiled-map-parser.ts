@@ -18,6 +18,7 @@ import {
     isTiledObjectRect,
     isTiledObjectPolygon,
 } from "./tiled-object-types";
+import { TiledTileSet } from "./tiled-tile-set-types";
 
 export function parseTiledRenderOrder(renderOrder: TiledMapRenderOrder): DrawOrder {
     switch (renderOrder) {
@@ -151,13 +152,17 @@ export function parseTiledLayers(input: TiledLayer[]): Map2dLayer[] {
     return layers;
 }
 
+export function parseTiledTileset<TResource>(tileSet: TiledTileSet): TileSet<TResource> {
+    
+}
+
 export function parseTiledMap<TResource>(input: unknown): Map2dParserResult<TResource> {
     if (!isTiledMap(input)) {
         return { status: Map2dParserStatus.ERROR };
     }
     const dimensions = vec2(input.width, input.height);
     const tileDimensions = vec2(input.tilewidth, input.tileheight);
-    const tileSets: TileSet<TResource>[] = [];
+    const tileSets: TileSet<TResource>[] = input.tilesets.map(tileSet => parseTiledTileset(tileSet));
     const layers = parseTiledLayers(input.layers);
     const drawOrder = parseTiledRenderOrder(input.renderorder);
     return {
