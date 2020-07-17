@@ -9,7 +9,7 @@ import {
     Map2dObject,
     Map2dShape,
 } from "friengine-maps-2d";
-import { isTiledMap, TiledMapRenderOrder } from "./tiled-map-types";
+import { isTiledMap, TiledMapRenderOrder, TiledTileSetIndex, TiledTileSetReference } from "./tiled-map-types";
 import { TiledLayerTiles, TiledLayerObjects, TiledLayer, isTiledLayerObjects } from "./tiled-layer-types";
 import {
     TiledObject,
@@ -152,7 +152,7 @@ export function parseTiledLayers(input: TiledLayer[]): Map2dLayer[] {
     return layers;
 }
 
-export function parseTiledTileset<TResource>(tileSet: TiledTileSet): TileSet<TResource> {
+export function parseTiledTileset<TResource>(tileSet: ((TiledTileSet | TiledTileSetReference) & TiledTileSetIndex)): TileSet<TResource> {
     
 }
 
